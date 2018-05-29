@@ -165,7 +165,7 @@ To obtain the correlation time, we can, for example, compute the magnetization a
 \begin{align}
 \chi(t) = \int dt'[m(t')m(t'+t)-\braket{m}^2]
 \end{align}
-We plot an example in Figure \textbf{FIGURE}. To get statistically independent measurements, we would formally like to wait twice the correlation time $2\tau$, where $\tau$ is the time needed for the auto-correlation to drop by a factor of $\frac{1}{e}$. For the system in the figure, we would like to wait \textbf{A BILLION} sweeps between measurements. Unfortunately, we immediately run into the issue of time: taking 100 measurements would involves \textbf{A BILLION} sweeps. For practical purposes, we take measurements after every sweep; although our measurements are not entirely uncorrelated, we are will be more interested in behavior across a temperature range than at a specific temperature, so the trend of the data will be more important than their specific values.
+We plot an example in Figure \textbf{FIGURE}. To get statistically independent measurements, we would formally like to wait twice the correlation time $2\tau$, where $\tau$ is the time needed for the auto-correlation to drop by a factor of $\frac{1}{e}$. For the system in the figure, we would like to wait \textbf{A BILLION} sweeps between measurements. Unfortunately, we immediately run into the issue of time: taking 100 measurements would involves \textbf{A BILLION} sweeps. For practical purposes, we take measurements after every sweep; although our measurements are not entirely uncorrelated, we are will be more interested in behavior across a temperature range than at a specific temperature, so the trend of the data will be more important than their specific values. We also rely on the fact that expect our data to fall within a relatively narrow range of values to begin with (this naturally becomes less accurate as fluctuations grow).
 
 While the Metropolis algorithm is highly efficient at very high and very low temperatures, the critical temperature region poses a major difficulty for two reasons: critical fluctuations and critical slowing down. As one approaches the critical temperature, the presence of spin clusters can cause significant statistical error and large fluctuations in the region of interest. One can somewhat mitigate this issue by approaching the critical temperature from below, but statistical errors will still tend to be large around the critical temperature. Formally, one deals with statistical errors by simply averaging over a larger sample size. However, as one approaches the critical temperature, the correlation time will generally scale as $\tau \propto \xi^z$, where $\xi$ is the correlation length and $z$ is the critical exponent and has been measured to be approximately $2.17$ for the Metropolis algorithm. At $T_c$, the correlation length is the size of the lattice itself (so divergent in the thermodynamic limit), implying that large numbers of measurements will take an impractical amount of time to obtain. Critical slowing down is an innate aspect of the Metropolis algorithm, so there is nothing much that can be done to deal with the issue. We will see that the Wolff algorithm is much more efficient around the critical temperature, because critical slowing down is much less pronounced.
 
@@ -189,8 +189,59 @@ Using the specific heat as an example, the idea is to resample our total sample 
 
 
 \section{Anti-ferromagnetic Ising model in 2D}
+By setting $J < 0$ in the Ising Hamiltonian in equation (1), we obtain the anti-ferromagnetic Ising model. Aligned spins then have a positive energy contribution, so spins will preferentially anti-align. The two ground states of the system then correspond to the two ``checkerboard" patterns on the lattice, where every spin is surrounded by the opposite spin. The order parameter is now the \textit{staggered magnetization}, whose value on a spin at the $i,j$ location on the lattice is
+\begin{equation}
+	m^{\dagger}_{ij} = (-1)^{i+j}s_{ij}
+\end{equation}
+Essentially, we assign a sign to each lattice site that multiplies against the spin. For our simulation, we assign $+1$ to the spins whose indices on the 2D lattice sum to an even number. The magnitude of the total staggered magnetization is then maximized precisely in the checkerboard ground state, and averages to 0 for high temperatures.
+
+We can easily adapt the code we use for the ferromagnetic Ising model for the anti-ferromagnetic model -- simply change the sign of $J$. The results of the simulation are shown in Figure \textbf{FIGURE}. We find evidence of a second-order phase transition at a critical temperature of $T_c = \textbf{A BILLION}$ and critical exponents $\textbf{A BILLION}$. 
+
+
+
+
+
 
 \section{Potts Model}
+\subsection{Theory}
+A natural generalization of the Ising model is to consider spins with more possible states. Taking $q$ to be a positive integer, the $q$-state Potts model is defined by the Hamiltonian
+\begin{equation}
+	H = -J\sum_{\braket{ij}}\delta_{s_i,s_j} - h\sum_{i}s_i
+\end{equation}
+where $\delta_{ij}$ is the Kronecker delta which takes the value $1$ when $i = j$ and is 0 otherwise. As before, we will only consider the case of a vanishing external field and set $h = 0$. The Hamiltonian is again the sum of the energy in bonds between spins, with bonds between identical spins contributing $-J$ and bonds between non-identical spins contributing 0. By rewriting the Hamiltonian, we can see that the Ising model is equivalent to the $q = 2$ Potts model up to an energy rescaling and an additive constant:
+\begin{equation}
+	H = -\frac{1}{2}J\sum_{\braket{ij}}2\left(\delta_{s_i,s_j} - \frac{1}{2}\right) - \frac{1}{2}\sum_{\braket{ij}}J
+\end{equation}
+
+On comparison with the Ising model, we find a couple differences: there are now $q$-many ground states, corresponding to all spins on the lattice taking on the same value. Furthermore, the entropy of a Potts model with $q > 2$ is significantly higher at all temperatures, because there are far more possible microstates.
+
+\subsection{Implementation}
+The Metropolis algorithm may still be applied to simulate the $q$-state Potts model: randomly select a spin $s_i$ and a value for the spin $s_i' \neq s_i$. Then compute the change in energy $\Delta E$ resulting from the change $s_i \to s_i'$. If $\Delta E < 0$, we accept the new state. If $\Delta E > 0$, we accept the new state with probability $e^{-\beta \Delta E}$. All of our previous optimization comments remain true: one need only compute the energy of the full lattice at the beginning of the simulation and increment by $\Delta E$ at each step, and the spectrum of possible $\Delta E$ is small enough that computing the Boltzmann factors at the beginning of the simulation is highly efficient.
+
+While the Metropolis algorithm is reasonably efficient for low $q$, it significantly slows down as $q$ increases. For example, for $q = 100$ and low temperatures, consider a spin $s_i$ whose neighbors all have different values. There are at most 4 values of $s_i'$ that will decrease the energy of the lattice, so there is at most a $4/99$ chance that the algorithm will select a spin value that lowers the energy. Because the other $95/99$ choices for $s_i'$ have $\Delta E = 0$, they will always be accepted. The algorithm will spend most of the time accepting new configurations that do not give rise to any dynamics, because the ratio of interesting states to possible states is so high. On the other hand, suppose $s_i$ does match one of its neighbors. Then there are at $96/99$ choices for $s_i'$ that yield $\Delta E > 0$, and at low temperatures, the acceptance ratio is very low. The algorithm will spend most of its time rejecting these higher energy states. 
+
+A more efficient algorithm for higher $q$ is the heat-bath algorithm, which assigns chooses states as if in a heat bath at the given temperature. More precisely, the acceptance ratio is 1 for every state, while the selection probability for each state $n \in \{1,\ldots,q\}$ is
+\begin{equation}
+	p_n = \frac{e^{-\beta E_n}}{\sum_{i=1}^q e^{-\beta E_i}}
+\end{equation}
+This manifestly satisfies detailed balance, and will preferentially select states that evolve the system, rather than spend a significant amount of time sorting through un-dynamical states.
+
+The selection probability distribution also has the advantage of being relatively easy and efficient to implement. The Hamiltonian can be split into a two parts: one that depends on the spin in question $s_k$, and one that does not.
+\begin{equation}
+	H = -J\sum_{\braket{ij}\ i,j\neq k}\delta_{s_i,s_j} - J\sum_{\braket{ik}}\delta_{s_i,s_k}
+\end{equation}
+The first term will be the same in all the exponentials in $p_n$, so it cancels out. We therefore need only sum over 4 terms for each exponential. Moreover, we do not actually need to compute the energy in every case; clearly there can only be at most 4 values of $s_k$ that will yield a non-zero contribution to the Hamiltonian. Therefore, there are only 4 exponentials in $p_n$ that actually need to be computed, with the rest just having value 1. In computing the energy for those 4 exponentials, there are only 4 non-zero values for $\Delta E$: $\{-J, -2J, -3J, -4J\}$. Because the spectrum is so small, we can use the same trick as in our other simulations, where we compute the exponentials once at the beginning of the simulation and just pull the values as needed.
+
+A comparison of the equilibration times for the Metropolis and heat-bath algorithms for the $q = 10$ model is shown in Figure \textbf{FIGURE}. Although one step of the heat-bath algorithm is slower than the Metropolis algorithm by a $\mathcal{O}(1)$ factor, the equilibration time is faster by a factor of $\textbf{A BILLION}$, representing a significant gain in efficiency.
+
+It is worth noting that for small $q$, when there are only a few un-dynamical states, the Metropolis algorithm may be faster. As an example, we show equilibration times for a $q = 3$ model in Figure \textbf{FIGURE}. The Metropolis algorithm not only equilibrates faster, but each steps is also faster than the heat-bath algorithm, so it is clearly faster. 
+
+\subsection{Results}
+
+
+
+
+
 
 \section{XY Model}
 
