@@ -1,0 +1,184 @@
+\documentclass[twocolumn,aps,prl]{revtex4-1} % For final two-column format
+%\documentclass[twocolumn,aps,prl]{revtex4-1} % For double-spaced, single-column draft
+
+\usepackage{graphicx}% Include figure files
+\usepackage{amsmath,amssymb}
+\usepackage{braket}
+
+% It may be convenient to define shortcut commands such as these:
+\newcommand{\abs}[1]{\ensuremath{\vert #1 \vert}}
+\renewcommand{\vec}[1]{\ensuremath{\mathbf{#1}}}
+\newcommand{\uvec}[1]{\ensuremath{\hat{\vec{#1}}}}
+\newcommand{\pd}{\partial}
+
+
+
+\begin{document}
+
+\title{Simulating the 2D Ising Model and Extensions}
+
+\author{Newton Cheng}
+\affiliation{Department of Physics, Stanford University, Stanford, California 94305, USA}
+
+\date{\today}
+\begin{abstract}
+In this paper, we review the basics of Markov chain Monte Carlo techniques, and then proceed to apply said techniques to simulate the 2D Ising model using the Metropolis and Wolff cluster algorithms. Using our simulation, we find evidence of a phase transition and critical behavior at a critical temperature of $T_c = 234123412$ and values of the critical exponents $\alpha = 2141$, $\beta = 234532$, and $\gamma = 2345234$. These results agree with the analytic values to $123421\%$. We then proceed to extend our work by considering other models with similar techniques, such as the anti-ferromagnetic 2D Ising model, the $q = 3$ Potts model, and the $XY$ model. In all cases, we find evidence of critical behavior, and are able to extract information that agrees to good precision with analytic studies of the behavior. We conclude by considering possible improvements to our simulations, as well as possible further avenues.
+\end{abstract}
+
+\maketitle
+\section{Introduction}
+Note that we use natural units with $k_B = 1$. Want to perform simulations of the 2D Ising model using Monte Carlo techniques. Also explore extensions to the Ising model with similar techniques.
+\section{Background}
+The 2D Ising model on a lattice is defined by the Hamiltonian:
+\begin{equation}
+H = -J\sum_{\braket{ij}}s_is_j - h\sum_i s_i
+\end{equation}
+where $s_i$ is the $i$th spin on the lattice, $\braket{ij}$ refers to nearest neighbors on the lattice, $J$ is the coupling strength between the spins, and $h$ is a coupling to an external magnetic field. Without loss of generality, we can take $s_i = \pm 1$ (just rescale $J$), and we will be concerned with the basic case of the square lattice. Notice that the energy is determined only by local properties of the total spin configuration, and the sign of $J$ determines if spins preferentially align or anti-align. When $J > 0$, the model is ferromagnetic, and $J < 0$ corresponds to an anti-ferromagnetic model. We will only be concerned with the case of no external magnetic field, so we set $h = 0$. \\
+
+\textit{insert picture here} \\
+
+The partition function is
+\begin{equation}
+Z = \sum_{\{s_i\}}e^{-\beta H}
+\end{equation}
+where $\{\sigma_i\}$ is the set of all $2^N$ spin configurations of the lattice with $N$ sites. Some quantities we will be interested in are the mean energy and the mean magnetization per spin:
+\begin{align}
+\braket{E} &= -J \left\langle\sum_{\braket{ij}}s_is_j\right\rangle \\
+\braket{m} &= \frac{1}{N}\braket{M} = \frac{1}{N}\left\langle\sum_is_i\right\rangle 
+\end{align}
+We will also be interested in the specific heat per spin and the magnetic susceptibility:
+\begin{align}
+c &= \frac{1}{N}\frac{\pd \braket{E}}{\pd T} = \frac{\beta^2}{N}(\braket{E^2} - \braket{E}^2) \\
+\chi &= \frac{1}{N}\frac{\pd \braket{M}}{\pd B} = \frac{\beta}{N} (\braket{M^2} - \braket{M}^2)
+\end{align}
+
+We can understand some of the properties of the model by examining the high and low temperature limits of the model with $N$ lattice sites. At low temperatures, the two ground states of fully aligned spins dominate the partition function. The energy per spin of an infinite lattice or lattice with periodic boundary conditions with coordination number $z$ is simply $E/N = -Jz/2$, so for our square lattice with $z = 4$, we have $E/N = -2J$. We also expect that the mean magnetization per spin should be $1$ or $-1$, as is the case for the two ground states.
+
+
+At high temperatures, every spin configuration is equally likely, so the highest entropy configurations dominate. We therefore expect that there are approximately equal numbers of up and down spins, the mean energy per spin is 0, and that the magnetization $\braket{s}$ is 0. This can be analytically confirmed by performing a high temperature expansion of the partition function, upon which one finds that only closed paths on the lattice (in terms of active bonds) contribute. \\
+
+One of the primary motivations for studying the 2D Ising model is the presence of a phase transition; this is evident from the change of the order parameter $\braket{s}$ at high and low temperatures. The critical temperature can be analytically computed using the self-dual property of the 2D Ising model on the square lattice; every term in the partition function's high temperature expansion can be mapped in a unique fashion to the partition function's low temperature expansion. The temperature at the ``crossing point" can be computed to be $T_c/J = \frac{2}{\ln(\sqrt{2}+1)}$. As a check on our simulation later, we will compute various thermodynamic quantities of the system (mean energy, magnetization etc.) on both sides of the critical temperature, and check that we obtain the expected results.
+
+
+\section{Metropolis Algorithm}
+\subsection{Theory}
+We begin by briefly reviewing the relevant aspects of simulating thermal systems using Monte Carlo techniques. The two defining aspects of any Monte Carlo algorithm are the selection probability and the acceptance ratio. The selection probability  $g$ refers to the probability distribution from which we select a new state, and the acceptance ratio $A$ refers to the probability that we accept the new state and transition to it from our current state. The total transition probability of moving from state $X$ to state $Y$ is then the product of these two probabilities: $P(X \to Y) = g(X \to Y)A(X \to Y)$. 
+
+The fact that we hope to simulate a thermal system creates two constraints on any algorithm: ergodicity and detailed balance. Ergodicity is the requirement that any state be obtainable from any other state using the algorithm. Detailed balance is the requirement that the rate a system transitions from a state $X$ to a state $Y$ is equal to the rate that a system will transition from $Y$ to $X$. In practice, this is the requirement that our transition probabilities obey the probability distribution enforced by the physics. We will always work in the canonical ensemble, so we require that the ratio of our transition probabilities satisfy the Boltzmann distribution:
+\begin{equation}
+\frac{P(X \to Y)}{P(Y \to X)} = e^{-\beta(E_Y - E_X)}
+\end{equation}
+
+The first algorithm we will use to simulate the 2D Ising model is perhaps the most historically important: the Metropolis algorithm, introduced by Nicolas Metropolis and his colleagues in 1953. This is also the most well-known example of a single-spin-flip algorithm, so-called because the state-to-state evolution occurs by flipping one spin each time. The selection probabilities of all states that differ from the current state by one spin are equal, and the selection probability of all other states are 0. More concretely, consider a lattice of $N$ spins in a configuration we call $X$. There are a set of spin configurations $\{S_i\}$ that differ from $X$ by one spin. Then the selection probability is
+\begin{equation}
+g(X \to Y) = \begin{cases}
+\frac{1}{N},& \quad Y = S_i \\
+0,& \quad \text{else}
+\end{cases}
+\end{equation}
+Detailed balance then implies that the acceptance ratios must satisfy:
+\begin{equation}
+\frac{P(X \to Y)}{P(Y \to X)} = \frac{A(X \to Y)}{A(Y \to X)} = e^{-\beta(E_Y - E_X)}
+\end{equation}
+
+The simplest choice would be to simply set $A(X \to Y) = A_0e^{-\frac{1}{2}\beta(E_Y - E_X)}$ for some constant $A_0$, which turns out to be a maximum at $e^{-4\beta J}$ for the square lattice. Unfortunately, this is extremely slow and inefficient, because almost all acceptance probabilities are 0; in particular, when $E_Y - E_X > 0$, there is almost no chance of acceptance. 
+
+The Metropolis algorithm solves this issue by offering an acceptance ratio:
+\begin{equation}
+A(X \to Y) = \begin{cases}
+e^{-\beta(E_Y - E_X)}, & E_Y - E_X > 0 \\
+1, & \text{else}
+\end{cases}
+\end{equation}
+In other words, if the selected configuration has a lower energy than the current one, it is automatically accepted. Otherwise, it is accepted with a probability determined by the Boltzmann factor. This acceptance ratio manifestly obeys the detailed balance constraint, and has the advantage of being significant faster, because it spends far less time rejecting states than the simplest choice. Ergodicity is also clear with this algorithm, as it is clearly possible to reach any state from any other by systematically flipping individual spins.
+
+
+\subsection{Implementation}
+In this section, we provide the details of our implementation of Markov chain Monte Carlo techniques to simulate a 2D Ising model. Our simulation is performed entirely in Python.
+
+Taking our spins to have value $\pm 1$, we define a 2D array with elements that can take on $\pm 1$ to represent our array. We take the array to have periodic boundary conditions, so that we can neglect edge effects. The starting state for almost all of our simulations is the $T = 0$ state with all spins aligned. The other option is to use a $T = \infty$ state, where every spin has a $50/50$ probability of taking on either $+1$ or $-1$. 
+
+Now we apply the Metropolis algorithm. To do this, we use a program that performs the following steps:
+\begin{enumerate}
+	\item Randomly select a spin on the given lattice
+	\item Flip the spin and compute the change in energy of the lattice $\Delta E$
+	\item If $\Delta E < 0$, accept the new state
+	\item If $\Delta E > 0$, generate a random number $X$ from a uniform distribution $[0,1)$
+	\item If $X < e^{-\beta \Delta E}$, accept the new state; otherwise reject the new state
+\end{enumerate}
+We may then iterate over this function $n$ times to perform $n$ timesteps of evolution. It is useful to introduce the time-unit \textit{sweep}, corresponding to $N$ timesteps, where $N$ is the number of lattice sites. The attempt frequency of flipping any particular spin is then independent of the lattice size, and we will use this as our preferred unit of time. Some pictures of the evolution of a lattice are shown in Figure \textbf{FIGURE}.
+
+\subsection{Optimizations}
+Because we will be interested in performing long running simulations across multiple temperatures, we would like to make the simulation as efficient as possible. Towards that end, we implement several optimazations.
+
+First, we take advantage of the fact that the energy of a spin on the lattice is a local property of the lattice. Computing the energy of the entire lattice is generically a time-consuming process; the number of bonds on the lattice is $N_B = 2N$, so the energy will be given by a sum with that many terms. Once the number of iterations becomes large, this will be a highly expensive sum to compute at every step. Instead, we can directly compute the change in energy, independent of the total energy. The different in energy between two states $X$ and $Y$ that differ by one spin $s_k$ is
+\begin{align}
+E_Y - E_X &= -J\sum_{\braket{ij}}s^Y_is^Y_j + J\sum_{\braket{ij}}s^X_is^X_j \\
+&= -J\sum_{\braket{ik}}s^X_i(s^Y_k-s^X_k)
+\end{align}
+The change in energy is just a sum over the nearest neighbors to $s_k$. Then using the fact that $s^Y_k = -s_k^X$, we conclude
+\begin{equation}
+\Delta E = 2Js_k^X\sum_{\braket{ik}}^{}s_i^X
+\end{equation}
+This is just a sum over 4 terms and depends only on the state prior to flipping the spin. Evidently this is far more efficient than summing over the entire lattice at every step.
+
+Given that we compute the change in energy at every step, we also have a way to efficiently measure the energy at every timestep: compute the energy of the initial lattice $E_i$, then just increment that number by the change in energy with every timestep $E_j = E_i + \Delta E$. This is far more efficient than computing the energy of the entire lattice at every step.
+
+We may use a similar trick for keeping track of the magnetization of the lattice. Generically, we need to sum over the entire lattice, but we know that the change in magnetization of flipping, say, spin $s_k$ is simply $\Delta M = 2s_k$. Then we just compute the magnetization of the lattice at the beginning, and increment that value by $\Delta M$ every time a spin is flipped.
+
+Because the change in energy is limited to 4 terms that are $\pm 2J$ (the change per bond), the entire spectrum of energy changes is simply $\{-8J, -4J, 0, 4J, 8J\}$. Then instead of computing the Boltzmann factor $e^{-\beta\Delta E}$ at every iteration, which is very computationally expensive due to the exponential, we can compute the factors once at the beginning of the simulation for a given temperature. Moreover, we do not even need to compute the Boltzmann factor for all the energy changes, just the ones that are positive. We then need only compute 2 exponentials, instead of $5n$, where $n$ is the number of iterations.
+
+\subsection{Equilibration and Measurement}
+We briefly discuss equilibration and the measurement technique we use in our simulation. Given that our initial lattice is at $T = 0$ or $T = \infty$, we have to allow the simulation to equilibrate at our desired temperature $T$ before taking any measurements. For example, it's clear that the $T = 0$ configuration is not an equilibrium configuration for $T = 100$, because several spins will flip within the first several iterations. For our simulation, we take equilibration this to mean that thermodynamic quantities whose mean values depend on the system temperature are relatively stable within a narrow range. This is purposefully a vague definition; we are ultimately more interested in the thermodynamic quantities of the state, not the specific state itself, and we expect thermal fluctuations about the mean. In our simulation, we consider 2 quantities: the energy per spin and magnetization per spin. An example of how these quantities will evolve over time is shown in Figure \textbf{FIGURE}. \\
+
+We see that for the first part of the simulation, the energy and magnetization rapidly change; clearly any measurements taken at any point in that time range will be inaccurate. However, after \textbf{A BILLION} sweeps, we see that the energy and magnetization become stable, oscillating around a mean value. Such behavior signals equilibration. In all our simulations, we first perform such a check to ensure that our system has equilibrated before beginning to take measurements.
+
+We want to obtain mean values for various quantities like the energy. The natural way to do this is to take a series of measurements at the same temperature, and then find the arithmetic mean of the measurements. However, such a process only yields the true mean if each measurement is independent of the previous one. Because our simulation utilizes single-flip dynamics, it seems clear that measurements taken too soon together will be correlated. In an extreme case, one can imagine measuring the magnetization of the system after just one Monte Carlo step, so that the second measurement is either the same as the first one or differs by $\pm 2$, which is a very strong correlation. So ideally we need to wait long enough between measurements that the state we measure from is significantly different from the first.
+
+To obtain the correlation time, we can, for example, compute the magnetization auto-correlation defined by
+\begin{equation}
+\chi(t) = \int dt'[m(t')-\braket{m}][m(t'+t)-\braket{m}] = \int dt'[m(t')m(t'+t)-\braket{m}^2]
+\end{equation}
+We plot an example in Figure \textbf{FIGURE}. To get statistically independent measurements, we would formally like to wait twice the correlation time $2\tau$, where $\tau$ is the time needed for the auto-correlation to drop by a factor of $\frac{1}{e}$. For the system in the figure, we would like to wait \textbf{A BILLION} sweeps between measurements. Unfortunately, we immediately run into the issue of time: taking 100 measurements would involves \textbf{A BILLION} sweeps. For practical purposes, we take measurements after every sweep; although our measurements are not entirely uncorrelated, we are will be more interested in behavior across a temperature range than at a specific temperature, so the trend of the data will be more important than their specific values.
+
+While the Metropolis algorithm is highly efficient at very high and very low temperatures, the critical temperature region poses a major difficulty for two reasons: critical fluctuations and critical slowing down. As one approaches the critical temperature, the presence of spin clusters can cause significant statistical error and large fluctuations in the region of interest. One can somewhat mitigate this issue by approaching the critical temperature from below, but statistical errors will still tend to be large around the critical temperature. Formally, one deals with statistical errors by simply averaging over a larger sample size. However, as one approaches the critical temperature, the correlation time will generally scale as $\tau \propto \xi^z$, where $\xi$ is the correlation length and $z$ is the critical exponent and has been measured to be approximately $2.17$ for the Metropolis algorithm. At $T_c$, the correlation length is the size of the lattice itself (so divergent in the thermodynamic limit), implying that large numbers of measurements will take an impractical amount of time to obtain. Critical slowing down is an innate aspect of the Metropolis algorithm, so there is nothing much that can be done to deal with the issue. We will see that the Wolff algorithm is much more efficient around the critical temperature, because critical slowing down is much less pronounced.
+
+\subsection{Error}
+The error in our measurements is computed using the bootstrap method -- the benefit of this method is that it does not require knowing the correlation time, nor does it require truly independent measurements. Moreover, it also readily applies to direct measurements, like mean energy, and to functions of means, like the specific heat.
+
+Using the specific heat as an example, the idea is to resample our total sample of measurements and compute the specific heat from that resample, then repeat the process several times. As an example, suppose we are given 100 measurements of the energy that we would like to use to compute the specific heat. Then we choose 100 values from the measurements with replacement, so that we may pick up duplicates, and compute the specific heat from those 100 values. We then repeat the process, and after several iterations, say 100, the standard deviation of the bootstrap values approaches the true error:
+\begin{equation}
+\sigma^2 = \bar{c^2} - \bar{c}^2
+\end{equation}
+
+
+
+
+
+
+\subsection{Results and Accuracy Check}
+
+
+\section{Wolff Algorithm}
+
+
+\section{Anti-ferromagnetic Ising model in 2D}
+
+\section{Potts Model}
+
+\section{XY Model}
+
+
+\section{Conclusion}
+
+
+\section{Acknowledgments}
+We gratefully acknowledge the assistance of our teaching assistant Edwin Huang, who advised this project, answered questions, reviewed our code, and everything in between. We also thank Professor Blas Cabrera for his teaching and his work in putting together the new iteration of PHYSICS 113.
+
+
+
+
+
+
+
+\end{document}
