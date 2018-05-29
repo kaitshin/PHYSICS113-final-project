@@ -17,18 +17,18 @@
 
 \title{Simulating the 2D Ising Model and Extensions}
 
-\author{Newton Cheng}
+\author{Newton Cheng and Kaitlyn Shin}
 \affiliation{Department of Physics, Stanford University, Stanford, California 94305, USA}
 
 \date{\today}
 \begin{abstract}
-In this paper, we review the basics of Markov chain Monte Carlo techniques, and then proceed to apply said techniques to simulate the 2D Ising model using the Metropolis and Wolff cluster algorithms. Using our simulation, we find evidence of a phase transition and critical behavior at a critical temperature of $T_c = 234123412$ and values of the critical exponents $\alpha = 2141$, $\beta = 234532$, and $\gamma = 2345234$. These results agree with the analytic values to $123421\%$. We then proceed to extend our work by considering other models with similar techniques, such as the anti-ferromagnetic 2D Ising model, the $q = 3$ Potts model, and the $XY$ model. In all cases, we find evidence of critical behavior, and are able to extract information that agrees to good precision with analytic studies of the behavior. We conclude by considering possible improvements to our simulations, as well as possible further avenues.
+In this paper, we review the basics of Markov chain Monte Carlo techniques, and then proceed to apply said techniques to simulate the 2D Ising model using the Metropolis and Wolff cluster algorithms. Using our simulation, we find evidence of a phase transition and critical behavior at a critical temperature of $T_c = 234123412$ and values of the critical exponents $\alpha = 2141$, $\beta = 234532$, and $\gamma = 2345234$. These results agree with the analytic values to $123421\%$. We then proceed to extend our work by considering other models with similar techniques, such as the anti-ferromagnetic 2D Ising model, the $q = 3$ Potts model, and the $XY$ model. In all cases, we find evidence of critical behavior, and are able to extract information that agrees to good precision with analytic studies of the behavior. We conclude by considering possible improvements to our simulations, as well as possible further avenues of exploration.
 \end{abstract}
 
 \maketitle
 \section{Introduction}
-Note that we use natural units with $k_B = 1$. Want to perform simulations of the 2D Ising model using Monte Carlo techniques. Also explore extensions to the Ising model with similar techniques.
-\section{Background}
+Note that we use natural units with $k_B = 1$. 
+\section{2D Ising Model}
 The 2D Ising model on a lattice is defined by the Hamiltonian:
 \begin{equation}
 H = -J\sum_{\braket{ij}}s_is_j - h\sum_i s_i
@@ -55,20 +55,46 @@ c &= \frac{1}{N}\frac{\pd \braket{E}}{\pd T} = \frac{\beta^2}{N}(\braket{E^2} - 
 We can understand some of the properties of the model by examining the high and low temperature limits of the model with $N$ lattice sites. At low temperatures, the two ground states of fully aligned spins dominate the partition function. The energy per spin of an infinite lattice or lattice with periodic boundary conditions with coordination number $z$ is simply $E/N = -Jz/2$, so for our square lattice with $z = 4$, we have $E/N = -2J$. We also expect that the mean magnetization per spin should be $1$ or $-1$, as is the case for the two ground states.
 
 
-At high temperatures, every spin configuration is equally likely, so the highest entropy configurations dominate. We therefore expect that there are approximately equal numbers of up and down spins, the mean energy per spin is 0, and that the magnetization $\braket{s}$ is 0. This can be analytically confirmed by performing a high temperature expansion of the partition function, upon which one finds that only closed paths on the lattice (in terms of active bonds) contribute. \\
+At high temperatures, every spin configuration is equally likely, so the highest entropy configurations dominate. We therefore expect that there are approximately equal numbers of up and down spins, the mean energy per spin is 0, and that the magnetization $\braket{s}$ is 0. This can be analytically confirmed by performing a high temperature expansion of the partition function, upon which one finds that only closed paths on the lattice (in terms of active bonds) contribute. 
 
-One of the primary motivations for studying the 2D Ising model is the presence of a phase transition; this is evident from the change of the order parameter $\braket{s}$ at high and low temperatures. The critical temperature can be analytically computed using the self-dual property of the 2D Ising model on the square lattice; every term in the partition function's high temperature expansion can be mapped in a unique fashion to the partition function's low temperature expansion. The temperature at the ``crossing point" can be computed to be $T_c/J = \frac{2}{\ln(\sqrt{2}+1)}$. As a check on our simulation later, we will compute various thermodynamic quantities of the system (mean energy, magnetization etc.) on both sides of the critical temperature, and check that we obtain the expected results.
+One of the primary motivations for studying the 2D Ising model is the presence of a phase transition; this is evident from the change of the order parameter $\braket{m}$ at high and low temperatures. The critical temperature can be analytically computed using the self-dual property of the 2D Ising model on the square lattice; every term in the partition function's high temperature expansion can be mapped in a unique fashion to the partition function's low temperature expansion. The temperature at the ``crossing point" can be computed to be $T_c/J = \frac{2}{\ln(\sqrt{2}+1)}$. As a check on our simulation later, we will compute various thermodynamic quantities of the system on both sides of the critical temperature, and check that we obtain the expected results.
 
+We will also be interested in analyzing the critical behavior itself. The phase transition is second-order, with divergences in the the specific heat, magnetization per spin, and magnetic susceptibility. The associated critical exponents can be analytically computed as $\alpha = 0$, $\beta = \frac{1}{8}$, and $\gamma = \frac{7}{4}$, respectively. Ideally, our simulation will be able to reproduce all 3 critical exponents.
 
-\section{Metropolis Algorithm}
-\subsection{Theory}
-We begin by briefly reviewing the relevant aspects of simulating thermal systems using Monte Carlo techniques. The two defining aspects of any Monte Carlo algorithm are the selection probability and the acceptance ratio. The selection probability  $g$ refers to the probability distribution from which we select a new state, and the acceptance ratio $A$ refers to the probability that we accept the new state and transition to it from our current state. The total transition probability of moving from state $X$ to state $Y$ is then the product of these two probabilities: $P(X \to Y) = g(X \to Y)A(X \to Y)$. 
+\section{Markov Chain Monte Carlo}
+In thermal systems, we are generally interested in the expectation value of some observable $Q$, rather than the precise state of the system. Generically, the expectation value can be computed with the system's partition function:
+\begin{equation}
+	\braket{Q} = \frac{\sum_{n}Q_ne^{-\beta E_n}}{\sum_{n}e^{-\beta E_n}}
+\end{equation}
+Beyond the absolute simplest models, analytically computing such a quantity is intractable. The idea behind using Monte Carlo techniques to simulate such systems is that one samples states according to some specified probability distribution, and then obtains an estimate of $\braket{Q}$ from the sample:
+\begin{equation}
+	Q_M = \frac{\sum^M_{n=1}Q_n\frac{e^{-\beta E_n}}{p_n}}{\sum^M_{n=1}\frac{e^{-\beta E_n}}{p_n}}
+\end{equation}
+One possible choice is to sample all possible states with equal probability, so $p_n = 1$ for all $n$. This is generally a poor choice, because outside of extremely high temperatures, there are relatively few states that dominate the partition function at any given temperature due to the exponential suppression of the Boltzmann factor, so most of the chosen sampled states in the estimator above will contribute nothing to the sum. Correspondingly, the estimate itself will be highly inaccurate unless one samples a large number of states.
 
-The fact that we hope to simulate a thermal system creates two constraints on any algorithm: ergodicity and detailed balance. Ergodicity is the requirement that any state be obtainable from any other state using the algorithm. Detailed balance is the requirement that the rate a system transitions from a state $X$ to a state $Y$ is equal to the rate that a system will transition from $Y$ to $X$. In practice, this is the requirement that our transition probabilities obey the probability distribution enforced by the physics. We will always work in the canonical ensemble, so we require that the ratio of our transition probabilities satisfy the Boltzmann distribution:
+A clever choice of probability distribution is the Boltzmann distribution itself $p_n = e^{-\beta E_n}/Z$, so that the dominant states are sampled most frequently, and we obtain a more accurate estimate while looking at fewer states. The estimator becomes
+\begin{equation}
+	Q_M = \frac{1}{M}\sum_{n=1}^MQ_n
+\end{equation}
+which is much more tractable. This general strategy is called importance sampling. The goal is then to develop a systematic method of selecting states according to the Boltzmann distribution.
+
+The obvious choice is to randomly choose states, which we then accept with probability $e^{-\beta E_n}$. This runs into the same problem as before, where almost all states have a minuscule probability of acceptance. A better choice is to use a Markov process, which generically refers to a process by which a given state $X$ transitions to a state $Y$ with transition probability $P(X \to Y)$. The transition probabilities for a Markov process are constant, depend only on the initial state $X$ and candidate state $Y$, and sum to 1. Repeatedly applying such a process to evolve a system generates a Markov chain of states. The next step is to select the transition probabilities to reflect the Boltzmann distribution.
+
+The fact that we hope to simulate a thermal system creates two constraints on the transition probabilities: ergodicity and detailed balance. Ergodicity is the requirement that any state be obtainable from any other state using the algorithm. Detailed balance is the requirement that the rate a system transitions from a state $X$ to a state $Y$ is equal to the rate that a system will transition from $Y$ to $X$, which we model as 
+\begin{equation}
+	p_XP(X \to Y) = p_YP(Y \to X)
+\end{equation}
+
+We want our sample probabilities $p_n$ to satisfy the Boltzmann distribution, so we constrain the transition probabilities to satisfy:
 \begin{equation}
 \frac{P(X \to Y)}{P(Y \to X)} = e^{-\beta(E_Y - E_X)}
 \end{equation}
 
+The total transition probability of moving from state $X$ to state $Y$ is the product of these two probabilities: $P(X \to Y) = g(X \to Y)A(X \to Y)$. The selection probability  $g$ refers to the probability distribution from which we select a new state, and the acceptance ratio $A$ refers to the probability that we accept the new state and transition to it from our current state. An algorithm refers to a particular choice of the selection probability distribution and the acceptance ratios.
+
+
+\section{Metropolis Algorithm}
+\subsection{Theory}
 The first algorithm we will use to simulate the 2D Ising model is perhaps the most historically important: the Metropolis algorithm, introduced by Nicolas Metropolis and his colleagues in 1953. This is also the most well-known example of a single-spin-flip algorithm, so-called because the state-to-state evolution occurs by flipping one spin each time. The selection probabilities of all states that differ from the current state by one spin are equal, and the selection probability of all other states are 0. More concretely, consider a lattice of $N$ spins in a configuration we call $X$. There are a set of spin configurations $\{S_i\}$ that differ from $X$ by one spin. Then the selection probability is
 \begin{equation}
 g(X \to Y) = \begin{cases}
@@ -94,7 +120,7 @@ In other words, if the selected configuration has a lower energy than the curren
 
 
 \subsection{Implementation}
-In this section, we provide the details of our implementation of Markov chain Monte Carlo techniques to simulate a 2D Ising model. Our simulation is performed entirely in Python.
+Our simulation is performed entirely in Python.
 
 Taking our spins to have value $\pm 1$, we define a 2D array with elements that can take on $\pm 1$ to represent our array. We take the array to have periodic boundary conditions, so that we can neglect edge effects. The starting state for almost all of our simulations is the $T = 0$ state with all spins aligned. The other option is to use a $T = \infty$ state, where every spin has a $50/50$ probability of taking on either $+1$ or $-1$. 
 
@@ -136,9 +162,9 @@ We see that for the first part of the simulation, the energy and magnetization r
 We want to obtain mean values for various quantities like the energy. The natural way to do this is to take a series of measurements at the same temperature, and then find the arithmetic mean of the measurements. However, such a process only yields the true mean if each measurement is independent of the previous one. Because our simulation utilizes single-flip dynamics, it seems clear that measurements taken too soon together will be correlated. In an extreme case, one can imagine measuring the magnetization of the system after just one Monte Carlo step, so that the second measurement is either the same as the first one or differs by $\pm 2$, which is a very strong correlation. So ideally we need to wait long enough between measurements that the state we measure from is significantly different from the first.
 
 To obtain the correlation time, we can, for example, compute the magnetization auto-correlation defined by
-\begin{equation}
-\chi(t) = \int dt'[m(t')-\braket{m}][m(t'+t)-\braket{m}] = \int dt'[m(t')m(t'+t)-\braket{m}^2]
-\end{equation}
+\begin{align}
+\chi(t) = \int dt'[m(t')m(t'+t)-\braket{m}^2]
+\end{align}
 We plot an example in Figure \textbf{FIGURE}. To get statistically independent measurements, we would formally like to wait twice the correlation time $2\tau$, where $\tau$ is the time needed for the auto-correlation to drop by a factor of $\frac{1}{e}$. For the system in the figure, we would like to wait \textbf{A BILLION} sweeps between measurements. Unfortunately, we immediately run into the issue of time: taking 100 measurements would involves \textbf{A BILLION} sweeps. For practical purposes, we take measurements after every sweep; although our measurements are not entirely uncorrelated, we are will be more interested in behavior across a temperature range than at a specific temperature, so the trend of the data will be more important than their specific values.
 
 While the Metropolis algorithm is highly efficient at very high and very low temperatures, the critical temperature region poses a major difficulty for two reasons: critical fluctuations and critical slowing down. As one approaches the critical temperature, the presence of spin clusters can cause significant statistical error and large fluctuations in the region of interest. One can somewhat mitigate this issue by approaching the critical temperature from below, but statistical errors will still tend to be large around the critical temperature. Formally, one deals with statistical errors by simply averaging over a larger sample size. However, as one approaches the critical temperature, the correlation time will generally scale as $\tau \propto \xi^z$, where $\xi$ is the correlation length and $z$ is the critical exponent and has been measured to be approximately $2.17$ for the Metropolis algorithm. At $T_c$, the correlation length is the size of the lattice itself (so divergent in the thermodynamic limit), implying that large numbers of measurements will take an impractical amount of time to obtain. Critical slowing down is an innate aspect of the Metropolis algorithm, so there is nothing much that can be done to deal with the issue. We will see that the Wolff algorithm is much more efficient around the critical temperature, because critical slowing down is much less pronounced.
