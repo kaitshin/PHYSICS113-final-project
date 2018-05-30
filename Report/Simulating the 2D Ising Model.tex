@@ -7,9 +7,6 @@
 \usepackage{esvect}
 
 % It may be convenient to define shortcut commands such as these:
-\newcommand{\abs}[1]{\ensuremath{\vert #1 \vert}}
-\renewcommand{\vec}[1]{\ensuremath{\mathbf{#1}}}
-\newcommand{\uvec}[1]{\ensuremath{\hat{\vec{#1}}}}
 \newcommand{\pd}{\partial}
 
 
@@ -189,7 +186,7 @@ Using the specific heat as an example, the idea is to resample our total sample 
 
 
 \subsection{Results and Accuracy Check}
-As a first check, we want to make sure that the system behaves as we would expect at low and high temperature limits. In the low temperature limit, all the spins should be aligned so that the energy is at the minimum $E_0 = -2N$ and the magnitude of the magnetization is 1. In the high temperature limit, spins are randomly aligned so that both the energy and the magnetization are 0. Some examples on a $100 \times 100$ grid are shown in Figure \textbf{FIGURE}. We see that we have the expected behavior across the critical temperature, with a progression of total randomness to domain formation to full alignment going from high to low temperature, and the reverse when going from low to high.
+As a first check, we want to make sure that the system behaves as we would expect at low and high temperature limits. In the low temperature limit, all the spins should be aligned so that the energy is at the minimum $E_0 = -2N$ and the magnitude of the magnetization is 1. In the high temperature limit, spins are randomly aligned so that both the energy and the magnetization are 0. Some examples on a $100 \times 100$ grid are shown in Figure \textbf{FIGURE}. We see that we have the expected behavior across the critical temperature, with a progression of total randomness to domain formation to full alignment going from high to low temperature.
 
 A stronger check of the accuracy of simulation is how well it can reproduce the expected critical behavior of the 2D Ising model. To do this, we explore a range of temperatures,  $T = 1.6$ to $T = 2.9$, around the known critical temperature $T_c = 2.27$ in $.01$ increments, as seen in Figure \textbf{FIGURE}. At every temperature value, we allow the system to equilibrate over $100N$ sweeps for a $N \times N$ lattice, and then proceed to make $50N$ measurements of the energy and magnetization, with each measurement separated by one sweep. The measurements can then be averaged to obtain the specific heat and magnetic susceptibility. All the plots of these values for every lattice we explored can be found in the \textbf{APPENDIX}.
 
@@ -263,10 +260,9 @@ It is worth noting that for small $q$, when there are only a few un-dynamical st
 
 
 \section{XY Model}
-\subsection{Theory}
 Whereas the Ising model represents a simple system of spins constrained to 1 dimension ($n=1$), the XY model represents a system of with interacting two-dimensional vector spins ($n=2$). The 2D XY model on a lattice is defined by the Hamiltonian: 
 \begin{equation}
-	H = -J\sum_{\braket{ij}} \cos(\theta_i - \theta_j) - h\sum_i \theta_i
+H = -J\sum_{\braket{ij}} \cos(\theta_i - \theta_j) - h\sum_i \theta_i
 \end{equation}
 where $\theta_i$ is the $i$th spin on the lattice, $\braket{ij}$ refers to nearest neighbors on the lattice, $J$ is the coupling strength between the spins, and $h$ is a coupling to an external magnetic field $\textbf{CITE}$. The state $\theta_i$ can belong to the region [0, 2$\pi$). Again, without loss of generality, we work with the basic case of the square lattice with the case of no external magnetic field ($h=0$). When $J > 0$, the model is ferromagnetic, and when $J<0$, the model is anti-ferromagnetic. 
 
@@ -288,8 +284,6 @@ The Metropolis algorithm may again be used to simulate the 2D XY model. For all 
 As before, the energy of a spin on the lattice is a local property with four neighboring spins affected. This algorithm is iterated for $N$ units of time, with $n$ steps of evolution per sweep.
 
 A Wolff clustering algorithm was considered, but due to time constraints was unable to be implemented. However, such an algorithm for the 2D XY model would have been implemented similarly to the Wolff clustering algorithm implemented for the 2D Ising model. A random spin on the lattice $\vv \theta_i$ would be chosen, as well as a random two-dimensional unit vector $\vv r$. Then the clustering condition, rather than having the spins be the same, would be the condition $(\vv \theta_i \cdot \vv r) (\vv \theta_i \cdot \vv r) > 0$, after which the spin would be accepted to cluster with some probability. The cluster would then be flipped by reflecting every spin in the cluster through the line perpendicular to $\vv r$. Such a clustering algorithm implementation would greatly speed up the 2D XY model simulation at low temperatures, enabling the simulation to reach an equilibrium configuration faster than the Metropolis algorithm used. 
-
-\subsection{Results}
 
 \section{Conclusion}
 
