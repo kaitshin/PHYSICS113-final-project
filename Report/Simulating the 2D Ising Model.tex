@@ -4,6 +4,7 @@
 \usepackage{graphicx}% Include figure files
 \usepackage{amsmath,amssymb}
 \usepackage{braket}
+\usepackage{esvect}
 
 % It may be convenient to define shortcut commands such as these:
 \newcommand{\abs}[1]{\ensuremath{\vert #1 \vert}}
@@ -136,7 +137,7 @@ We may then iterate over this function $n$ times to perform $n$ timesteps of evo
 \end{figure*}
 
 \subsection{Optimizations}
-Because we will be interested in performing long running simulations across multiple temperatures, we would like to make the simulation as efficient as possible. Towards that end, we implement several optimazations.
+Because we will be interested in performing long running simulations across multiple temperatures, we would like to make the simulation as efficient as possible. Towards that end, we implement several optimizations.
 
 First, we take advantage of the fact that the energy of a spin on the lattice is a local property of the lattice. Computing the energy of the entire lattice is generically a time-consuming process; the number of bonds on the lattice is $N_B = 2N$, so the energy will be given by a sum with that many terms. Once the number of iterations becomes large, this will be a highly expensive sum to compute at every step. Instead, we can directly compute the change in energy, independent of the total energy. The difference in energy between two states $X$ and $Y$ that differ by one spin $s_k$ is
 \begin{align}
@@ -262,7 +263,31 @@ It is worth noting that for small $q$, when there are only a few un-dynamical st
 
 
 \section{XY Model}
+\subsection{Theory}
+Whereas the Ising model represents a simple system of spins constrained to 1 dimension ($n=1$), the XY model represents a system of with interacting two-dimensional vector spins ($n=2$). The 2D XY model on a lattice is defined by the Hamiltonian: 
+\begin{equation}
+	H = -J\sum_{\braket{ij}} \cos(\theta_i - \theta_j) - h\sum_i \theta_i
+\end{equation}
+where $\theta_i$ is the $i$th spin on the lattice, $\braket{ij}$ refers to nearest neighbors on the lattice, $J$ is the coupling strength between the spins, and $h$ is a coupling to an external magnetic field. Again, without loss of generality, we work with the basic case of the square lattice with the case of no external magnetic field ($h=0$). When $J > 0$, the model is ferromagnetic, and when $J<0$, the model is anti-ferromagnetic. 
 
+This system is of great theoretical interest because of its circular symmetry. As a result of the Mermin--Wagner Theorem, in this $n \leq 2$ system, continuous symmetries cannot be spontaneously broken at finite temperatures with short-range interactions within the system. However, although there is no second-order phase transition (the derivative of the specific heat per spin $c_v$ is continuous), there is a transition from a high-temperature disordered phase to a low-temperature quasi-ordered phase. In the former disordered phase, the correlation function decays exponentially; in the latter quasi-ordered phase, most of the spins tend to be aligned and the correlation function has a power law decay. This transition between the two phases, called the $Kosterlitz$--$Thouless$ transition, occurs at some critical temperature $T_c$ and is of infinite order. 
+
+There are topologically stable configurations in the 2D XY model called $vortices$. 
+
+\subsection{Implementation}
+Again, the Metropolis algorithm may still be used to simulate the 2D XY model. For all simulations, the starting states consist of randomly arranged spins on a lattice with periodic boundary conditions, with the option of seeding available for result reproducibility. As with the Metropolis algorithm implementation for the 2D Ising model simulation, we implement a program in Python that follows the following steps:
+\begin{enumerate}
+	\item Randomly select a spin on the given lattice
+	\item Change the spin to a random orientation and compute the change in Hamiltonian energy of the lattice $\Delta H$
+	\item If $\Delta H < 0$, accept the new state
+	\item If $\Delta H > 0$, generate a random number $X$ from a uniform distribution $[0,1)$
+	\item If $X < e^{-\beta \Delta H}$, accept the new state; otherwise reject the new state
+\end{enumerate}
+As before, the energy of a spin on the lattice is a local property with four neighboring spins affected. This algorithm is iterated for $N$ units of time, with $n$ steps of evolution per sweep.
+
+A Wolff clustering algorithm was considered, but due to time constraints was unable to be implemented. However, such an algorithm for the 2D XY model would have been implemented similarly to the Wolff clustering algorithm implemented for the 2D Ising model. A random spin on the lattice $\vv \theta_i$ would be chosen, as well as a random two-dimensional unit vector $\vv r$. Then the clustering condition, rather than having the spins be the same, would be the condition $(\vv \theta_i \cdot \vv r) (\vv \theta_i \cdot \vv r) > 0$, after which the spin would be accepted to cluster with some probability. The cluster would then be flipped by reflecting every spin in the cluster through the line perpendicular to $\vv r$. 
+
+\subsection{Results}
 
 \section{Conclusion}
 
