@@ -190,7 +190,7 @@ As a first check, we want to make sure that the system behaves as we would expec
 
 A stronger check of the accuracy of simulation is how well it can reproduce the expected critical behavior of the 2D Ising model. To do this, we explore a range of temperatures,  $T = 1.6$ to $T = 2.9$, around the known critical temperature $T_c = 2.27$ in $.01$ increments, as seen in Figure \textbf{FIGURE}. At every temperature value, we allow the system to equilibrate over $100N$ sweeps for a $N \times N$ lattice, and then proceed to make $50N$ measurements of the energy and magnetization, with each measurement separated by one sweep. The measurements can then be averaged to obtain the specific heat and magnetic susceptibility. All the plots of these values for every lattice we explored can be found in the \textbf{APPENDIX}.
 
-There are several caveats to keep in mind about our results. The first is that the finite temperature resolution size ultimately limits the precision of our results, so we cannot really trust our results beyond 3 significant figures. The equilibration time value is somewhat arbitrarily chosen using the heuristic that it takes order $N^3$ steps to equilibrate, and is probably not enough for temperatures very close to the critical temperature. However, we would like to explore intermediate-sized lattices, so we opt to trade accuracy in the computation for accuracy in the system size. From looking at the various plots for different lattice sizes, increasing the lattice size also greatly improves the precision of our results. The instability of the simulation near the critical temperature is particularly pronounced for the smaller lattices because the critical fluctuations affect a larger fraction of the lattice, and extracting information about the critical behavior would be close to impossible.
+There are several caveats to keep in mind about our results. The first is that the finite temperature resolution size ultimately limits the precision of our results, so we cannot really trust our results beyond 3 significant figures. The equilibration time value is somewhat arbitrarily chosen using the heuristic that it takes order $N^3$ steps to equilibrate, and is probably not enough for temperatures very close to the critical temperature. However, we would like to explore intermediate-sized lattices, so we opt to trade accuracy in the computation for accuracy in the system size. From looking at the various plots for different lattice sizes, increasing the lattice size also greatly improves the precision of our results and reduces the error on each data point. The instability of the simulation near the critical temperature is particularly pronounced for the smaller lattices because the critical fluctuations affect a larger fraction of the lattice, and extracting information about the critical behavior would be close to impossible.
 
 Using our values for the magnetization per spin and magnetic susceptibility, we perform a non-linear least squares fit to a function of the form (coming from below the critical temperature)
 \begin{equation}
@@ -202,87 +202,6 @@ The largest lattice we consider is a $50 \times 50$ lattice, and we find critica
 
 
 \section{Wolff Algorithm}
-\subsection{Theory}
-The second algorithm we use is the Wolff algorithm, a clustering algorithm named after Ulli Wolff. 
-%The first algorithm we will use to simulate the 2D Ising model is perhaps the most historically important: the Metropolis algorithm, introduced by Nicolas Metropolis and his colleagues in 1953. This is also the most well-known example of a single-spin-flip algorithm, so-called because the state-to-state evolution occurs by flipping one spin each time. The selection probabilities of all states that differ from the current state by one spin are equal, and the selection probability of all other states are 0. More concretely, consider a lattice of $N$ spins in a configuration we call $X$. There are a set of spin configurations $\{S_i\}$ that differ from $X$ by one spin. Then the selection probability is
-%\begin{equation}
-%g(X \to Y) = \begin{cases}
-%\frac{1}{N},& \quad Y = S_i \\
-%0,& \quad \text{else}
-%\end{cases}
-%\end{equation}
-%Detailed balance then implies that the acceptance ratios must satisfy:
-%\begin{equation}
-%\frac{P(X \to Y)}{P(Y \to X)} = \frac{A(X \to Y)}{A(Y \to X)} = e^{-\beta(E_Y - E_X)}
-%\end{equation}
-%
-%The simplest choice would be to simply set $A(X \to Y) = A_0e^{-\frac{1}{2}\beta(E_Y - E_X)}$ for some constant $A_0$, which turns out to be a maximum at $e^{-4\beta J}$ for the square lattice. Unfortunately, this is extremely slow and inefficient, because almost all acceptance probabilities are 0; in particular, when $E_Y - E_X > 0$, there is almost no chance of acceptance. 
-%
-%The Metropolis algorithm solves this issue by offering an acceptance ratio:
-%\begin{equation}
-%A(X \to Y) = \begin{cases}
-%e^{-\beta(E_Y - E_X)}, & E_Y - E_X > 0 \\
-%1, & \text{else}
-%\end{cases}
-%\end{equation}
-%In other words, if the selected configuration has a lower energy than the current one, it is automatically accepted. Otherwise, it is accepted with a probability determined by the Boltzmann factor. This acceptance ratio manifestly obeys the detailed balance constraint, and has the advantage of being significant faster, because it spends far less time rejecting states than the simplest choice. Ergodicity is also clear with this algorithm, as it is clearly possible to reach any state from any other by systematically flipping individual spins.
-
-
-\subsection{Implementation}
-Our simulation is performed entirely in Python. For all simulations, we use units such that $J = 1$.
-
-%Taking our spins to have value $\pm 1$, we define a 2D array with elements that can take on $\pm 1$ to represent our array. We take the array to have periodic boundary conditions, so that we can neglect edge effects. The starting state for almost all of our simulations is the $T = 0$ state with all spins aligned. The other option is to use a $T = \infty$ state, where every spin has a $50/50$ probability of taking on either $+1$ or $-1$. 
-
-%Now we apply the Wolff algorithm. To do this, we use a program that performs the following steps:
-%\begin{enumerate}
-%	\item Randomly select a spin on the given lattice
-%	\item Flip the spin and compute the change in energy of the lattice $\Delta E$
-%	\item If $\Delta E < 0$, accept the new state
-%	\item If $\Delta E > 0$, generate a random number $X$ from a uniform distribution $[0,1)$
-%	\item If $X < e^{-\beta \Delta E}$, accept the new state; otherwise reject the new state
-%\end{enumerate}
-%We may then iterate over this function $n$ times to perform $n$ timesteps of evolution. It is useful to introduce the time-unit \textit{sweep}, corresponding to $N$ timesteps, where $N$ is the number of lattice sites. The attempt frequency of flipping any particular spin is then independent of the lattice size, and we will use this as our preferred unit of time. Some pictures of the evolution of a lattice are shown in Fig.~\ref{fig:wolffevo}.
-\begin{figure*}
-	\includegraphics[width=\columnwidth]{"Wolff_evolution".pdf}
-	\caption{\label{fig:wolffevo}The evolution of a $100 \times 100$ square lattice at $T = 2.4$ via the Wolff algorithm. The sequence is ordered from left to right, top to bottom. The two spin states $+1$ and $-1$ correspond to black and white, respectively. We have initialized the system in the $T = 0$ state, and plotted the system after 0, 1, 5, 10, 20, 50, 100, 500, and 1000 Monte Carlo sweeps.}
-\end{figure*}
-
-\subsection{Optimizations}
-Although the Wolff algorithm equilibrates faster near the critical temperature than the Metropolis algorithm does, the algorithm itself is not inherently fast. Thus, we implement a few optimizations, largely along the same lines as for the Metropolis algorithm when possible (taking advantage of locality and runtime efficiency of certain data structures).
-
-\subsection{Equilibration and Measurement}
-%Given that our initial lattice is at $T = 0$ or $T = \infty$, we have to allow the simulation to equilibrate at our desired temperature $T$ before taking any measurements. For example, it's clear that the $T = 0$ configuration is not an equilibrium configuration for $T = 100$, because several spins will flip within the first several iterations. We may also refer to Fig.~\ref{fig:latevo}: any measurements made in the first 6 states are not accurate with respect to the final (most accurate) state. For our simulation, we take equilibration this to mean that thermodynamic quantities whose mean values depend on the system temperature are relatively stable within a narrow range. This is purposefully a vague definition; we are ultimately more interested in the thermodynamic quantities of the state, not the specific state itself, and we expect thermal fluctuations about the mean. In our simulation, we consider 2 quantities: the energy per spin and magnetization per spin. An example of how these quantities will evolve over time is shown in Fig.~\ref{fig:equil}. 
-%\begin{figure}
-%	\includegraphics[width=\columnwidth]{"Equilibration".pdf}
-%	\caption{\label{fig:equil}Plots of the total energy and the magnetization per spin on a $100 \times 100$ square lattice at $T = 2.4$ initialized at $T = 0$ and evolved with the Metropolis algorithm. We see that after roughly 500 sweeps, the system reaches equilibrium, with the energy hovering around $-1.2\cdot 10^{4}$ and the magnetization per spin around $0.1$.}
-%\end{figure}
-%
-%We see that for the first part of the simulation, the energy and magnetization rapidly change; clearly any measurements taken at any point in that time range will be inaccurate. However, after roughly 500 sweeps, we see that the energy and magnetization become stable, oscillating around a mean value. Such behavior signals equilibration. In all our simulations, we first perform such a check to ensure that our system has equilibrated before beginning to take measurements. Moreover, because we are interested in a small range of temperatures, one can equilibrate beginning from the final state of the previous temperature. Because the states will presumably be fairly close, equilibration occurs faster.
-%
-%We want to obtain mean values for various quantities like the energy. The natural way to do this is to take a series of measurements at the same temperature, and then find the arithmetic mean of the measurements. However, such a process only yields the true mean if each measurement is independent of the previous one. Because our simulation utilizes single-flip dynamics, it seems clear that measurements taken too soon together will be correlated. In an extreme case, one can imagine measuring the magnetization of the system after just one Monte Carlo step, so that the second measurement is either the same as the first one or differs by $\pm 2$, which is a very strong correlation. So ideally we need to wait long enough between measurements that the state we measure from is significantly different from the first.
-%
-%To obtain the correlation time, we can, for example, compute the magnetization auto-correlation defined by
-%\begin{align}
-%\chi(t) = \int dt'[m(t')m(t'+t)-\braket{m}^2]
-%\end{align}
-%To get statistically independent measurements, we would ideally like to wait twice the correlation time $2\tau$, where $\tau$ is the time needed for the auto-correlation to drop by a factor of $\frac{1}{e}$. Unfortunately, we immediately run into the issue of time: $\tau$ is at least as large as 1 sweep (formally giving every spin the chance to flip), but usually larger. For practical purposes, we take measurements after every sweep; although our measurements are not entirely uncorrelated, we will be more interested in behavior across a temperature range than at a specific temperature, so the trend of the data will be more important than their specific values. We also rely on the fact that expect our data to fall within a relatively narrow range of values to begin with (this naturally becomes less accurate as fluctuations grow).
-%
-%While the Metropolis algorithm is extremely efficient at very high and very low temperatures, the critical temperature region poses a major difficulty for two reasons: critical fluctuations and critical slowing down. As one approaches the critical temperature, the presence of spin clusters can cause significant statistical error and large fluctuations in the region of interest. One can somewhat mitigate this issue by approaching the critical temperature from below, but statistical errors will still tend to be large around the critical temperature. Formally, one deals with statistical errors by simply averaging over a larger sample size. However, as one approaches the critical temperature, the correlation time will generally scale as $\tau \propto \xi^z$, where $\xi$ is the correlation length and $z$ is the critical exponent and has been measured to be approximately $2.17$ for the Metropolis algorithm. At $T_c$, the correlation length is the size of the lattice itself (so diverges in the thermodynamic limit), implying that large numbers of measurements will take an impractical amount of time to obtain. Critical slowing down is an innate aspect of the Metropolis algorithm, so there is nothing much that can be done to deal with the issue. We will see that the Wolff algorithm is much more efficient around the critical temperature, because critical slowing down is much less pronounced.
-
-\subsection{Error}
-% The error in our measurements is computed using the bootstrap method -- the benefit of this method is that it does not require knowing the correlation time, nor does it require truly independent measurements. Moreover, it also readily applies to direct measurements, like mean energy, and to functions of means, like the specific heat.
-
-
-
-
-
-
-\subsection{Results and Accuracy Check}
-% As a first check, we want to make sure that the system behaves as we would expect at low and high temperature limits. In the low temperature limit, all the spins should be aligned so that the energy is at the minimum $E_0 = -2N$ and the magnitude of the magnetization is 1. In the high temperature limit, spins are randomly aligned so that both the energy and the magnetization are 0. Some examples on a $100 \times 100$ grid are shown in Figure \textbf{FIGURE}. We see that we have the expected behavior across the critical temperature, with a progression of total randomness to domain formation to full alignment going from high to low temperature.
-
-% The largest lattice we consider is a $50 \times 50$ lattice, and we find critical values:
-
-
 
 
 \section{Anti-ferromagnetic Ising model in 2D}
