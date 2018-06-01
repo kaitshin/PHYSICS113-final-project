@@ -431,7 +431,7 @@ This system is of great theoretical interest because of its circular symmetry. A
 The degrees of freedom determining how ordered the system is come from topologically stable configurations in the 2D XY model called \textit{vortices}, which can be visualized as local sources/sinks (vortices) and saddles (anti-vortices) of multiple spins (Fig.~ \ref{fig:vortices}).
 \begin{figure}
 	\includegraphics[width=\columnwidth]{"vortices".pdf}
-	\caption{\label{fig:vortices} Examples of a single vortex (lower left) and anti-vortex (upper right) in the XY model. This simulation was run at $T = 0.1$, evolved with 250 sweeps of the Metropolis algorithm. Since $T > T_c$, the vortex and anti-vortex present themselves in a bound paired state with net zero vorticity.}
+	\caption{\label{fig:vortices} Examples of a single vortex (lower left) and anti-vortex (upper right) in the XY model. This simulation was run at $T = 0.1$, evolved with 250 sweeps of the Metropolis algorithm. Since $T < T_c$, the vortex and anti-vortex present themselves in a bound paired state with net zero vorticity.}
 \end{figure}
 In other words, these vortices are points on the lattice around which the spins are configured in a winding pattern, clockwise or counterclockwise. Below $T_c$, there are only a few vortices, which present themselves in bound vortex-antivortex pairs of net zero vorticity (Fig.~ \ref{fig:vortices}). Above $T_c$, there are many free vortices present in what can be called a vortex plasma. Vortex generation has been found to be the reason behind the exponential correlation decay at the high-temperature disordered phase $\textbf{CITE}$. Since these vortices are not bound, they can move due to the influence of an applied magnetic field. 
 
@@ -446,9 +446,25 @@ The Metropolis algorithm may again be used to simulate the 2D XY model. For all 
 	\item If $\Delta H > 0$, generate a random number $X$ from a uniform distribution $[0,1)$
 	\item If $X < e^{-\beta \Delta H}$, accept the new state; otherwise reject the new state
 \end{enumerate}
-As before, the energy of a spin on the lattice is a local property with four neighboring spins affected. This algorithm is iterated for $N$ units of time, with $n$ steps of evolution per sweep.
+As before, the energy of a spin on the lattice is a local property with four neighboring spins affected. This algorithm is iterated for $N$ units of time, with $n$ steps of evolution per sweep. The same basic optimizations implemented in the Metropolis algorithm for the 2D Ising model were also implemented for the 2D XY model.
 
 A Wolff clustering algorithm was considered, but due to time constraints was unable to be implemented. However, such an algorithm for the 2D XY model would have been implemented similarly to the Wolff clustering algorithm implemented for the 2D Ising model. A random spin on the lattice $\vv \theta_i$ would be chosen, as well as a random two-dimensional unit vector $\vv r$. Then the clustering condition, rather than having the spins be the same, would be the condition $(\vv \theta_i \cdot \vv r) (\vv \theta_i \cdot \vv r) > 0$, after which the spin would be accepted to cluster with some probability. The cluster would then be flipped by reflecting every spin in the cluster through the line perpendicular to $\vv r$. Such a clustering algorithm implementation would greatly speed up the 2D XY model simulation at low temperatures, enabling the simulation to reach an equilibrium configuration faster than the Metropolis algorithm used. 
+
+\subsection{Equilibration and Measurement}
+
+Because the Metropolis algorithm has difficulty converging near the critical temperature, the algorithm was forced to equilibrate for a large number of sweeps before taking measurements of observables (Fig.~ \ref{fig:xyequilb}).
+\begin{figure}
+	\includegraphics[width=\columnwidth]{"Equilibration4".pdf}
+	\caption{\label{fig:xyequiilb} Plots of the total energy and the magnetization per spin on a $20 \times 20$ square lattice at $T = 0.1$ initialized at $T = \infty$ and evolved with the Metropolis algorithm. We see that after roughly 1800 sweeps, the system reaches equilibrium.}
+\end{figure}
+The justification and methodology behind equilibrating the lattice before taking the measurements are the same for the 2D XY model as for the 2D Ising model. Because the 2D XY model has a KT transition, for $T < T_c$, the correlation length is infinite; the long correlation lengths associated with large sampling error and critical slowing down.
+
+\subsection{Accuracy Verification}
+
+As a check, the evolution of the 2D XY model with the Metropolis algorithm was animated to make sure that the system behaved as expected at low and high temperature limits. In the low temperature limit, after equilibration, the spins tended to be aligned (though there were still cases where bound vortex/anti-vortex pairs presented themselves at these low temperatures below $T_c$). There instances where the initial grid configuration (perhaps at $T = \infty$) pre-equilibration had vortices but the equilibrated state had no vortices--in these instances, as time went on, the spins gradually aligned themselves out of the vortex configurations (no symmetry was spontaneously broken). In the high temperature limit, many free vortices and anti vortices were present after equilibration, as expected. 
+
+
+\subsection{Results}
 
 \section{Conclusion}
 \textbf{HOW TO IMPROVE CODE FOR FUTURE (efficiency, flexible equilibration times, correlation times etc.)}
