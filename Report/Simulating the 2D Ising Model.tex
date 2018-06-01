@@ -293,15 +293,17 @@ We see that equilibration occurs after roughly 5000 steps, where energy and magn
 %where the primed parameters are for fitting a curve above the critical temperature. We perform the fit using the SciPy \texttt{optimize.curve\_fit} function and use the \texttt{sigma} argument to manually input the errors computed using the bootstrap method. The fit parameters $b,b'$ and $c,c'$ correspond to the critical temperature and critical exponent, respectively. We can also fit the specific heat per spin to this form, but the analytic solution for the 2D Ising model implies a logarithmic divergence, rather than a power law. Furthermore, in the case of the specific heat, the maximum we see is actually at the critical temperature \textbf{CITE}. It is also for this reason that we are looking to explore the largest lattices we can that do not require excessive computational time. We also expect that the finite size of the lattice will affect the behavior of the various thermodynamic quantities around the phase transition; the divergences associated with the phase transition are only true divergences in the thermodynamic limit $N \to \infty$. It is also well-known that the critical exponents and critical temperature suffer from finite size effects. We have not attempted to analyze these effects carefully, but we keep them in mind when discussing the confidence in our results.
 
 
-%\subsection{Results}
-%The largest lattice we consider is a $50 \times 50$ lattice with measurements presented in Fig.~\ref{fig:IsingM}.
-%\begin{figure*}
-%	\includegraphics[width=\linewidth]{"Ising Measurements".pdf}
-%	\caption{\label{fig:IsingM}Plots showing the mean energy per spin, specific heat per spin, mean (absolute) magnetization per spin, magnetic susceptibility on a 50 $\times$ 50 lattice from $T = 1.6$ to $T = 2.9$ in increments of $\Delta T = .01$. The lines overlaid on the data are lines of best-of-fit determined using \texttt{optimize.curve\_fit}. The equilibration time at each temperature is 5000 sweeps and each data point is obtained from 5000 measurements. The error bars computed using the bootstrap method are too small to see.}
-%\end{figure*}
-%
-%The first thing to note from the measurements is that we see evidence of critical behavior at roughly $T = 2.2$-$2.3$, where we expected the critical temperature to be based on analytic computations. The phase transition in the 2D Ising model is second-order, signaled by the order parameter (absolute magnetization per spin) dropping from 1 to 0 and characterized by divergences in the specific heat and susceptibility. We indeed see that the magnetization is very close to 1 below the critical temperature and is very close to 0 above the critical temperature. We also see peaks in the specific heat and susceptibility around the critical temperature. As expected, they remain finite throughout the simulation. Correspondingly, the step in the energy is not a true step with an infinite derivative, because $c \propto \frac{\pd E}{\pd T}$ is always finite.
-%
+\subsection{Results}
+The largest lattice we consider is a $30 \times 30$ lattice with measurements presented in Fig.~\ref{fig:WolffM}.
+\begin{figure*}
+	\includegraphics[width=\linewidth]{"Wolff_Measurements".pdf}
+	\caption{\label{fig:WolffM}Plots showing the mean energy per spin, specific heat per spin, mean (absolute) magnetization per spin, magnetic susceptibility on a 30 $\times$ 30 lattice from $T = 1.6$ to $T = 2.9$ in increments of $\Delta T = .01$. 
+	%The lines overlaid on the data are lines of best-of-fit determined using \texttt{optimize.curve\_fit}. 
+	The equilibration time at each temperature is 30 steps and each data point is obtained from 150 measurements. The error bars computed using the bootstrap method are too small to see.}
+\end{figure*}
+
+As expected, we see evidence of critical behavior at roughly $T_c = 2.2$-$2.3$ with a second order phase transition. Near this critical temperature the magnetization per spin goes from 1 (below $T_c$) to 0 (above $T_c$). The peaks in the specific heat and susceptibility around $T_c$ remain finite throughout the simulation, and correspondingly, the energy and magnetization steps are not truly steps with an infinite derivative, though they are theoretically characterized by divergences. 
+
 %In the region very close to the critical temperature, all 4 quantities see relatively significant scatter. This is most likely a result of critical slowing down. There is a strong chance that 5000 sweeps is not enough time to achieve equilibration in the critical temperature region; combined with critical fluctuations, this effect creates the scattering effect, even though we average over a large number of measurements. The main constraint on a longer equilibration time is a practical one: the time needed to truly equilibrate near the critical temperature for the Metropolis algorithm is simply too long to be efficient.
 %
 %Despite such effects, we are still able to see how the quantities generally behave in the critical temperature region, and our lattice is large enough that we have enough precision to attempt to fit curves with reasonable confidence. By fitting to functions with the form in Eq. (20), we find values for the critical exponents as presented in Table~\ref{tab:crit}. We separately discuss the obtained values for the critical temperature below.
