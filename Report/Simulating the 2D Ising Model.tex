@@ -198,7 +198,7 @@ As a first check, we want to make sure that the system behaves as we would expec
 
 We see that we have the expected behavior: a progression of full alignment at very low temperatures, domain formation across the critical temperature, and fully random spins at high temperatures. Our implementation of the Metropolis algorithm is able to produce lattices that align with our physical intuitions for a lattice system at various temperatures.
 
-A stronger check of the accuracy of simulation, and indeed our goal, is how well it can reproduce the expected critical behavior of the 2D Ising model. To do this, we explore a range of temperatures around the known critical temperature $T_c = \frac{2}{\ln(1+\sqrt{2})}J \approx 2.269J$ with $J = 1$. At every temperature value, we allow the system to equilibrate over $100L$ sweeps for a $L \times L$ lattice, and then proceed to make $100L$ measurements of the energy and magnetization, with each measurement separated by one sweep. The measurements can then be averaged to obtain the specific heat and magnetic susceptibility. All the plots of these values for every lattice we explored can be found in the \textbf{APPENDIX}.
+A stronger check of the accuracy of simulation, and indeed our goal, is how well it can reproduce the expected critical behavior of the 2D Ising model. To do this, we explore a range of temperatures around the known critical temperature $T_c = \frac{2}{\ln(1+\sqrt{2})}J \approx 2.269J$ with $J = 1$. At every temperature value, we allow the system to equilibrate over $100L$ sweeps for a $L \times L$ lattice, and then proceed to make $100L$ measurements of the energy and magnetization, with each measurement separated by one sweep. The measurements and their squares can then be averaged to obtain the specific heat and magnetic susceptibility. All the plots of these values for every lattice we explored can be found in the \textbf{APPENDIX}.
 
 There are several caveats to keep in mind about our results. The equilibration time value is somewhat arbitrarily chosen using the heuristic that it takes order $L^3$ steps to equilibrate, and is probably not enough for temperatures very close to the critical temperature. However, we would like to explore intermediate-sized lattices, so we opt to trade accuracy in the computation for accuracy in the system size. From looking at the various plots for different lattice sizes, increasing the lattice size also greatly improves the precision of our results and reduces the error on each data point. The inaccuracy of the simulation near the critical temperature is particularly pronounced for the smaller lattices because the critical fluctuations affect a larger fraction of the lattice, and extracting information about the critical behavior is close to impossible due to the scatter of the data. Finally, the finite temperature resolution size ultimately limits the precision of our results, so we cannot really trust our results beyond 3 significant figures. Critical slowing down makes the Metropolis algorithm highly impractical for exploring finer temperature resolutions around the critical temperature, and the finite size of the lattice means a finer temperature resolution is unlikely to provide enough information to offset the extreme time cost.
 
@@ -434,10 +434,19 @@ A Wolff clustering algorithm was considered, but due to time constraints was una
 \textbf{HOW TO IMPROVE CODE FOR FUTURE (efficiency, flexible equilibration times, correlation times etc.)}
 
 \section{Division of Labor}
+The entire project was a collaborative effort, each person regularly reviewing or helping out with the other person's code.
+
+Newton wrote the code, produced the plots and measurements, and analyzed the data for the Metropolis algorithm simulation of the 2D Ising model and the Potts model. He wrote the Introduction, 2D Ising Model, Markov Chain Monte Carlo, Metropolis Algorithm, and Potts model sections.
+
+Kaitlyn wrote the code, produced the plots and measurements, and analyzed the data for the Wolff algorithm simulation of the 2D Ising model and the XY model. She wrote the Wolff Algorithm, XY Model, and Conclusion sections.
+
+
 
 
 \section{Acknowledgments}
 We gratefully acknowledge the assistance of our teaching assistant Edwin Huang, who advised this project, answered many a question and email, reviewed parts of our code, and many other things too numerous to list here. We also thank Professor Blas Cabrera for his teaching and his work in putting together the new iteration of PHYSICS 113.
+
+\section{References}
 
 
 \section{Appendix}
