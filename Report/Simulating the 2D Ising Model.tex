@@ -461,10 +461,17 @@ The justification and methodology behind equilibrating the lattice before taking
 
 \subsection{Accuracy Verification}
 
-As a check, the evolution of the 2D XY model with the Metropolis algorithm was animated to make sure that the system behaved as expected at low and high temperature limits. In the low temperature limit, after equilibration, the spins tended to be aligned (though there were still cases where bound vortex/anti-vortex pairs presented themselves at these low temperatures below $T_c$). There instances where the initial grid configuration (perhaps at $T = \infty$) pre-equilibration had vortices but the equilibrated state had no vortices--in these instances, as time went on, the spins gradually aligned themselves out of the vortex configurations (no symmetry was spontaneously broken). In the high temperature limit, many free vortices and anti vortices were present after equilibration, as expected. 
-
+As a check, the evolution of the 2D XY model with the Metropolis algorithm was animated to make sure that the system behaved as expected at low and high temperature limits. In the low temperature limit, after equilibration, the spins tended to be aligned (though there were still cases where bound vortex/anti-vortex pairs presented themselves at these low temperatures below $T_c$). There instances where the initial grid configuration (at $T = \infty$) pre-equilibration had vortices but the equilibrated state had no vortices--in these instances, as time went on, the spins gradually aligned themselves out of the vortex configurations (no symmetry was spontaneously broken; Fig.~\ref{fig:xysanity}). 
+\begin{figure*}
+	\includegraphics[width=\linewidth]{"XYsanitycheck".pdf}
+	\caption{\label{fig:xysanity} Plots of the grid configuration on a $20 \times 20$ square lattice at $T = 0.1$ initialized at $T = \infty$ and evolved with the Metropolis algorithm. We see that as the system reaches equilibrium, the free vortices go away and the spins align in a quasi-ordered state.}
+\end{figure*}
+In the high temperature limit, many free vortices and anti vortices were present, as expected. 
 
 \subsection{Results}
+
+The 2D XY model
+
 
 \section{Conclusion}
 \textbf{HOW TO IMPROVE CODE FOR FUTURE (efficiency, flexible equilibration times, correlation times etc.)}
