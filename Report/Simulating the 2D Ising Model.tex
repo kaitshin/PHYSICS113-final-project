@@ -20,12 +20,24 @@
 
 \date{\today}
 \begin{abstract}
-In this paper, we review the basics of Markov chain Monte Carlo techniques, and then proceed to apply said techniques to simulate the 2D Ising model using the Metropolis and Wolff cluster algorithms. Using our simulation, we find evidence of a phase transition and critical behavior at a critical temperature of $T_c = 234123412$ and values of the critical exponents $\alpha = 2141$, $\beta = 234532$, and $\gamma = 2345234$. These results agree with the analytic values to $123421\%$. We then proceed to extend our work by considering other models with similar techniques, such as the anti-ferromagnetic 2D Ising model, the $q = 3$ Potts model, and the $XY$ model. In all cases, we find evidence of critical behavior, and are able to extract information that agrees to good precision with analytic studies of the behavior. We conclude by considering possible improvements to our simulations, as well as possible further avenues of exploration.
+In this paper, we review the basics of Markov chain Monte Carlo techniques, and then proceed to apply said techniques to simulate the 2D Ising model using the Metropolis and Wolff cluster algorithms. Using our simulation, we find evidence of a phase transition and critical behavior at a critical temperature of $T_c = 234123412$ and values of the critical exponents $\alpha = 2141$, $\beta = 234532$, and $\gamma = 2345234$. These results agree with the analytic values to $123421\%$. We then extend our work by applying our techniques to the Potts model and XY model. In all cases, we find evidence of critical behavior. We conclude by considering possible improvements to our simulations, as well as possible further avenues of exploration.
 \end{abstract}
 
 \maketitle
 \section{Introduction}
+Lattice systems have long been of interest because they provide a tractable microscopic description for macroscopic systems built from microscopic degrees of freedom. In particular, lattice systems are often able to exhibit phase transitions, providing a window into the microscopic details of such complex phenomena.
+
+One of the simplest and most studied lattice systems is the Ising model, which has proved to be a useful model for describing ferromagnetism and generically phase transitions between magnetized and non-magnetized phases. The model also has several natural generalizations to more complex or realistic models, such as those with higher dimensions, more spin states, or modeling quantum statistical mechanics. Our goal in this paper will be to explore the properties of the 2D Ising model and some of its more complicated cousins via computer simulation.
+
+We begin by reviewing the theoretical details of the 2D Ising model, as well as introducing our primary simulation tool, Markov chain Monte Carlo methods. We then perform simulations with two such methods, the Metropolis and Wolff cluster algorithms, to analyze the behavior of the model around the critical temperature for its phase transition. Because the 2D Ising model is so well-studied, we have access to a wealth of analytic results that we can check our simulation against; we will aim to reproduce the critical temperature and various critical exponents.
+
+
+
+
+
 Note that we use natural units with $k_B = 1$. 
+
+
 \section{2D Ising Model}
 The 2D Ising model on a lattice is defined by the Hamiltonian:
 \begin{equation}
@@ -240,16 +252,16 @@ The second algorithm we use is the Wolff algorithm, a clustering algorithm named
 
 If $m$ and $n$ represent non-added aligned spins to the cluster for the state before the flip ($A$) and the state after the flip ($B$), then the selection probability is 
 \begin{equation}
-	\frac{g(X \to Y)}{g(Y \to X)} = (1-P_{\rm add})^{m-n}
+\frac{g(X \to Y)}{g(Y \to X)} = (1-P_{\rm add})^{m-n}
 \end{equation}
 Detailed balance then implies that the acceptance ratios must satisfy:
 \begin{equation}
-	(1-P_{\rm add})^{m-n} \frac{A(X \to Y)}{A(Y \to X)} = e^{-\beta(E_Y - E_X)}
+(1-P_{\rm add})^{m-n} \frac{A(X \to Y)}{A(Y \to X)} = e^{-\beta(E_Y - E_X)}
 \end{equation}
 
 However, $E_Y - E_X = 2J(n-m)$, and thus
 \begin{equation}
-	\frac{A(X \to Y)}{A(Y \to X)} = \left[ (1-P_{\rm add})e^{\beta J} \right]^{n-m}.
+\frac{A(X \to Y)}{A(Y \to X)} = \left[ (1-P_{\rm add})e^{\beta J} \right]^{n-m}.
 \end{equation}
 By choosing $P_{\rm add} = 1-e^{2 \beta J}$, the acceptance probabilities become $A(X \to Y) = A(Y \to X) = 1$ and all the spins can be flipped once the cluster is formed. Therefore, with this special value of $P_{\rm add}$, the detailed balance condition is satisfied. Additionally, since any spin can clip, it is possible to reach any state from any other and thus this algorithm is ergodic as well. 
 
@@ -304,8 +316,8 @@ The largest lattice we consider is a $30 \times 30$ lattice with measurements pr
 \begin{figure*}
 	\includegraphics[width=\linewidth]{"Wolff_Measurements".pdf}
 	\caption{\label{fig:WolffM}Plots showing the mean energy per spin, specific heat per spin, mean (absolute) magnetization per spin, magnetic susceptibility on a 30 $\times$ 30 lattice from $T = 1.6$ to $T = 2.9$ in increments of $\Delta T = .01$. 
-	%The lines overlaid on the data are lines of best-of-fit determined using \texttt{optimize.curve\_fit}. 
-	The equilibration time at each temperature is 30 steps and each data point is obtained from 150 measurements. The error bars computed using the bootstrap method are too small to see.}
+		%The lines overlaid on the data are lines of best-of-fit determined using \texttt{optimize.curve\_fit}. 
+		The equilibration time at each temperature is 30 steps and each data point is obtained from 150 measurements. The error bars computed using the bootstrap method are too small to see.}
 \end{figure*}
 
 As expected, we see evidence of critical behavior at roughly $T_c = 2.2$-$2.3$ with a second order phase transition. Near this critical temperature the magnetization per spin goes from 1 (below $T_c$) to 0 (above $T_c$). The peaks in the specific heat and susceptibility around $T_c$ remain finite throughout the simulation, and correspondingly, the energy and magnetization steps are not truly steps with an infinite derivative, though they are theoretically characterized by divergences. 
@@ -328,6 +340,8 @@ As expected, we see evidence of critical behavior at roughly $T_c = 2.2$-$2.3$ w
 %The fits for critical exponents also provided candidate values for the critical temperature, given by the parameter $b$ and $b'$. Averaging the values, we obtain a critical temperature of $T_c = 2.276(10)$, which contains the analytic value $T_c \approx 2.269$ in its uncertainty range. However, there are a few things to keep in mind when interpreting our $T_c$: first, that the critical temperature is a quantity that scales with the lattice size, so our determined value is really the critical temperature for the 2D Ising model on a $50 \times 50$ lattice. However, the scaling is weak \textbf{CITE}, so it is likely that the uncertainty captures this effect. Second, the specific heat's maximum does not lie exactly at the critical temperature for finite lattices, but the correction is very small, so we assume that the uncertainty makes this effect un-resolvable \textbf{CITE}. Finally, our temperature resolution is .01, so our value for $T_c$ is about as precise a result we could hope to get out of our simulation.
 %
 In summary, the Wolff algorithm can successfully reproduce the low and high temperature limits of the ferromagnetic 2D Ising model, evolve a lattice in a way that agrees with intuition, and equilibrate much faster than locally updating algorithms such as the Metropolis algorithm. The critical temperature $T_c$ was reasonably estimated from the simulations, and behavior near $T_c$ roughly matches analytically known behavior. Inaccuracies mainly arise from runtime limitations as well as the finite size of the grid and the finite step size of the values.
+
+
 
 
 
@@ -384,7 +398,9 @@ The lattice evolved by the heat-bath algorithm equilibrates after around 300 swe
 However, for small $q$, when there are only a few un-dynamical states, the Metropolis algorithm may be faster. As an example, we show equilibration times for a $q = 2$ model, as can be seen in the lower plot of Fig.~\ref{fig:pottsequil}. The Metropolis algorithm not only equilibrates faster, but each steps is also faster than the heat-bath algorithm, so it is clearly faster overall. In fact, this is not too surprising since the $q = 2$ Potts model is equivalent to the 2D Ising model, and the Metropolis algorithm is generally accepted as the fastest single-spin algorithm for simulating the 2D Ising model. 
 
 \subsection{Results}
- 
+We simulate the Potts model for $q = 2,\ 3,\ 4,\ 5,\ 10,$ and $50$ on a $25 \times 25$ lattice, using thee Metropolis algorithm for $q = 2, 3, 4, 5$, and the heat-bath algorithm for $q = 10$ and $q = 50$. The results of all the simulations may be found in the \textbf{APPENDIX}. We analyze the critical behavior of the $q = 3$ model, and then comment on the general characteristics of the critical behavior of all the simulations.
+
+
 
 
 
