@@ -413,7 +413,10 @@ Our results for the $q = 3$ Potts model are presented in Fig.~\ref{fig:q3potts} 
 	\end{ruledtabular}
 \end{table}
 
-We see that our $\alpha,\ \alpha',\ \beta$, and $\gamma$ are in good agreement with the literature.
+We see that our obtained values for $\alpha,\ \alpha',\ \beta$, and $\gamma$ are in good agreement with the literature. This is a pleasant surprise, because it appears that the finite size effects of the lattice are reasonably contained within the uncertainties. The exception is the value we obtained for $\gamma'$; although the its uncertainty range technically intersects with the uncertainty range of the value in the literature, it is still very far away. By looking at the plot, the discrepancy is almost certainly due to the large fluctuations in our measurements. Again, the cause for the fluctuations is most probably due to the combination of critical fluctuations and un-equilibrated states near the critical temperature. As a result, we have a very low confidence in the value of $\gamma'$ to begin with, and the difference from the value in the literature affirms our lack of confidence.
+
+We again determine the critical temperature by averaging the results suggested by all the curve fits. We compute $T_c = 0.995(9)$, in good agreement with the analytic value.
+
 
 
 
@@ -429,12 +432,7 @@ where $\theta_i$ is the $i$th spin on the lattice, $\braket{ij}$ refers to neare
 
 This system is of great theoretical interest because of its circular symmetry. As a result of the Mermin--Wagner Theorem, in this $n \leq 2$ system, continuous symmetries cannot be spontaneously broken at finite temperatures with short-range interactions within the system $\textbf{CITE}$. However, although there is no second-order phase transition (the derivative of the specific heat per spin $c_v$ is continuous), there is a transition from a high-temperature disordered phase to a low-temperature quasi-ordered phase. In the former disordered phase, the correlation function decays exponentially; in the latter quasi-ordered phase, most of the spins tend to be aligned and the correlation function has a power law decay---the exponential correlation length is infinite. This transition between the two phases, called the \textit{Kosterlitz--Thouless transition} (hereafter the KT transition), occurs at some critical temperature $T_c$ and is of infinite order $\textbf{CITE}$. 
 
-The degrees of freedom determining how ordered the system is come from topologically stable configurations in the 2D XY model called \textit{vortices}, which can be visualized as local sources/sinks (vortices) and saddles (anti-vortices) of multiple spins (Fig.~ \ref{fig:vortices}).
-\begin{figure}
-	\includegraphics[width=\columnwidth]{"vortices".pdf}
-	\caption{\label{fig:vortices} Examples of a single vortex (lower left) and anti-vortex (upper right)  in the XY model.}
-\end{figure}
-In other words, these vortices are points on the lattice around which the spins are configured in a winding pattern, clockwise or counterclockwise. Below $T_c$, there are only a few vortices, which present themselves in bound vortex-antivortex pairs of net zero vorticity $\textbf{FIGURE}$. Above $T_c$, there are many free vortices present in what can be called a vortex plasma. Vortex generation has been found to be the reason behind the exponential correlation decay at the high-temperature disordered phase $\textbf{CITE}$. Since these vortices are not bound, they can move due to the influence of an applied magnetic field. 
+The degrees of freedom determining how ordered the system is come from topologically stable configurations in the 2D XY model called \textit{vortices}, which can be visualized as local sources/sinks (vortices) and saddles (anti-vortices) of multiple spins $\textbf{FIGURES}$. In other words, these vortices are points on the lattice around which the spins are configured in a winding pattern, clockwise or counterclockwise. Below $T_c$, there are only a few vortices, which present themselves in bound vortex-antivortex pairs of net zero vorticity $\textbf{FIGURE}$. Above $T_c$, there are many free vortices present in what can be called a vortex plasma. Vortex generation has been found to be the reason behind the exponential correlation decay at the high-temperature disordered phase $\textbf{CITE}$. Since these vortices are not bound, they can move due to the influence of an applied magnetic field. 
 
 Thus, the KT transition occurs because of vortex-antivortex pairs unbinding at $T_c$, which causes a sudden change in the response form to an arbitrarily weak applied magnetic field. This transition is observable in simulations of the 2D XY model, though large lattice sizes and long simulation times are often necessary to simulate and observe the transition accurately. The 2D XY model can be used to model systems that possess similar properties of symmetry and exhibit similar transition behavior, such as superfluidity in thin films---observed experimentally with He$^4$ $\textbf{CITE}$.
 
@@ -455,9 +453,9 @@ A Wolff clustering algorithm was considered, but due to time constraints was una
 \textbf{HOW TO IMPROVE CODE FOR FUTURE (efficiency, flexible equilibration times, correlation times etc.)}
 
 \section{Division of Labor}
-The entire project was a collaborative effort, each person regularly reviewing or helping out with the other person's code.
+The entire project was a collaborative effort, each person regularly reviewing, debugging, or generally helping out with the other person's code.
 
-Newton wrote the code, produced the plots and measurements, and analyzed the data for the Metropolis algorithm simulation of the 2D Ising model and the Potts model. He wrote the Introduction, 2D Ising Model, Markov Chain Monte Carlo, Metropolis Algorithm, and Potts model sections.
+Newton wrote the code, produced the plots and measurements, and analyzed the data for the Metropolis algorithm simulation of the 2D Ising model and the Potts Model. He wrote the Introduction, 2D Ising Model, Markov Chain Monte Carlo, Metropolis Algorithm, and Potts model sections.
 
 Kaitlyn wrote the code, produced the plots and measurements, and analyzed the data for the Wolff algorithm simulation of the 2D Ising model and the XY model. She wrote the Wolff Algorithm, XY Model, and Conclusion sections.
 
