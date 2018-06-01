@@ -281,7 +281,10 @@ Although the Wolff algorithm equilibrates faster near the critical temperature t
 % As a first check, we want to make sure that the system behaves as we would expect at low and high temperature limits. In the low temperature limit, all the spins should be aligned so that the energy is at the minimum $E_0 = -2N$ and the magnitude of the magnetization is 1. In the high temperature limit, spins are randomly aligned so that both the energy and the magnetization are 0. Some examples on a $100 \times 100$ grid are shown in Figure \textbf{FIGURE}. We see that we have the expected behavior across the critical temperature, with a progression of total randomness to domain formation to full alignment going from high to low temperature.
 
 % The largest lattice we consider is a $50 \times 50$ lattice, and we find critical values:
-
+\begin{figure*}
+	\includegraphics[width=\columnwidth]{"Wolff_evolution".pdf}
+	\caption{\label{fig:wolffevo}The evolution of a $100 \times 100$ square lattice at $T = 2.4$ via the Wolff algorithm. The sequence is ordered from left to right, top to bottom. The two spin states $+1$ and $-1$ correspond to black and white, respectively. We have initialized the system in the $T = 0$ state, and plotted the system after 0, 1, 5, 10, 20, 50, 100, 500, and 1000 Monte Carlo sweeps.}
+\end{figure*}
 
 
 
