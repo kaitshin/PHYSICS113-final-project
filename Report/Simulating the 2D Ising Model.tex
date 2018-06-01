@@ -190,7 +190,7 @@ As a first check, we want to make sure that the system behaves as we would expec
 
 A stronger check of the accuracy of simulation is how well it can reproduce the expected critical behavior of the 2D Ising model. To do this, we explore a range of temperatures,  $T = 1.6$ to $T = 2.9$, around the known critical temperature $T_c = 2.27$ in $.01$ increments, as seen in Figure \textbf{FIGURE}. At every temperature value, we allow the system to equilibrate over $100N$ sweeps for a $N \times N$ lattice, and then proceed to make $50N$ measurements of the energy and magnetization, with each measurement separated by one sweep. The measurements can then be averaged to obtain the specific heat and magnetic susceptibility. All the plots of these values for every lattice we explored can be found in the \textbf{APPENDIX}.
 
-There are several caveats to keep in mind about our results. The first is that the finite temperature resolution size ultimately limits the precision of our results, so we cannot really trust our results beyond 3 significant figures. The equilibration time value is somewhat arbitrarily chosen using the heuristic that it takes order $N^3$ steps to equilibrate, and is probably not enough for temperatures very close to the critical temperature. However, we would like to explore intermediate-sized lattices, so we opt to trade accuracy in the computation for accuracy in the system size. From looking at the various plots for different lattice sizes, increasing the lattice size also greatly improves the precision of our results. The instability of the simulation near the critical temperature is particularly pronounced for the smaller lattices because the critical fluctuations affect a larger fraction of the lattice, and extracting information about the critical behavior would be close to impossible.
+There are several caveats to keep in mind about our results. The first is that the finite temperature resolution size ultimately limits the precision of our results, so we cannot really trust our results beyond 3 significant figures. The equilibration time value is somewhat arbitrarily chosen using the heuristic that it takes order $N^3$ steps to equilibrate, and is probably not enough for temperatures very close to the critical temperature. However, we would like to explore intermediate-sized lattices, so we opt to trade accuracy in the computation for accuracy in the system size. From looking at the various plots for different lattice sizes, increasing the lattice size also greatly improves the precision of our results and reduces the error on each data point. The instability of the simulation near the critical temperature is particularly pronounced for the smaller lattices because the critical fluctuations affect a larger fraction of the lattice, and extracting information about the critical behavior would be close to impossible.
 
 Using our values for the magnetization per spin and magnetic susceptibility, we perform a non-linear least squares fit to a function of the form (coming from below the critical temperature)
 \begin{equation}
@@ -202,6 +202,7 @@ The largest lattice we consider is a $50 \times 50$ lattice, and we find critica
 
 
 \section{Wolff Algorithm}
+
 \subsection{Theory}
 The second algorithm we use is the Wolff algorithm, a clustering algorithm named after Ulli Wolff. 
 %The first algorithm we will use to simulate the 2D Ising model is perhaps the most historically important: the Metropolis algorithm, introduced by Nicolas Metropolis and his colleagues in 1953. This is also the most well-known example of a single-spin-flip algorithm, so-called because the state-to-state evolution occurs by flipping one spin each time. The selection probabilities of all states that differ from the current state by one spin are equal, and the selection probability of all other states are 0. More concretely, consider a lattice of $N$ spins in a configuration we call $X$. There are a set of spin configurations $\{S_i\}$ that differ from $X$ by one spin. Then the selection probability is
@@ -285,7 +286,6 @@ Although the Wolff algorithm equilibrates faster near the critical temperature t
 	\includegraphics[width=\columnwidth]{"Wolff_evolution".pdf}
 	\caption{\label{fig:wolffevo}The evolution of a $100 \times 100$ square lattice at $T = 2.4$ via the Wolff algorithm. The sequence is ordered from left to right, top to bottom. The two spin states $+1$ and $-1$ correspond to black and white, respectively. We have initialized the system in the $T = 0$ state, and plotted the system after 0, 1, 5, 10, 20, 50, 100, 500, and 1000 Monte Carlo sweeps.}
 \end{figure*}
-
 
 
 \section{Anti-ferromagnetic Ising model in 2D}
