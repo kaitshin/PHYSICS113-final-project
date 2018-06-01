@@ -27,15 +27,13 @@ In this paper, we review the basics of Markov chain Monte Carlo techniques, and 
 \section{Introduction}
 Lattice systems have long been of interest because they provide a tractable microscopic description for macroscopic systems built from microscopic degrees of freedom. In particular, lattice systems are often able to exhibit phase transitions, providing a window into the microscopic details of such complex phenomena.
 
-One of the simplest and most studied lattice systems is the Ising model, which has proved to be a useful model for describing ferromagnetism and generically phase transitions between magnetized and non-magnetized phases. The model also has several natural generalizations to more complex or realistic models, such as those with higher dimensions, more spin states, or modeling quantum statistical mechanics. Our goal in this paper will be to explore the properties of the 2D Ising model and some of its more complicated cousins via computer simulation.
+One of the simplest lattice systems is the Ising model, which has proved to be a useful model for describing ferromagnetism and generically phase transitions between magnetized and non-magnetized phases. The model also has several natural generalizations to more complex or realistic models, such as those with higher dimensions, more spin states, or modeling quantum statistical mechanics. Unfortunately, the model and its properties can still be difficult to work with analytically when one considers the model on all but smallest lattices. However, as a discrete lattice model, it is a prime candidate for computer simulation, which will allow a deeper exploration of its properties. Correspondingly, we may then learn more about the systems for which the Ising model is a good approximation.
 
-We begin by reviewing the theoretical details of the 2D Ising model, as well as introducing our primary simulation tool, Markov chain Monte Carlo methods. We then perform simulations with two such methods, the Metropolis and Wolff cluster algorithms, to analyze the behavior of the model around the critical temperature for its phase transition. Because the 2D Ising model is so well-studied, we have access to a wealth of analytic results that we can check our simulation against; we will aim to reproduce the critical temperature and various critical exponents.
+Our goal in this paper will be to explore the properties of the 2D Ising model and some of its more complicated cousins via computer simulation. We begin by reviewing the theoretical details of the 2D Ising model, as well as introducing our primary simulation tool, Markov chain Monte Carlo methods. We then perform simulations with two such methods, the Metropolis and Wolff cluster algorithms, to analyze the behavior of the model around the critical temperature for its phase transition. Because the 2D Ising model is so well-studied, we have access to a wealth of analytic results that we can check our simulation against; we will aim to reproduce the critical temperature and various critical exponents.
 
+We then move on to consider two generalizations of the 2D Ising model: the Potts model, in which spins on the lattice can have more than 2 states, and the XY model, in which the spins are taken to be continuous degree of freedom defined by their orientation. We adapt the Monte Carlo techniques used to simulate the Ising model to simulate these more complex models, and look for evidence of critical behavior that is consistent with theoretical analyses in the literature.
 
-
-
-
-Note that we use natural units with $k_B = 1$. 
+We will use natural units with $k_B = 1$. 
 
 
 \section{2D Ising Model}
