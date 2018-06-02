@@ -248,10 +248,6 @@ The fits for critical exponents also provided candidate values for the critical 
 In summary, we have determined that our simulation with the Metropolis algorithm can successfully reproduce the low and high temperature limits of the ferromagnetic 2D Ising model, as well as generically evolve a lattice in a way that agrees with our intuition. It is also able to exhibit critical behavior at a critical temperature that roughly matches the analytically known critical temperature. Moreover, we are able to extract some information about a few critical exponents from the simulation. However, the extreme inefficiency of the Metropolis algorithm near the critical temperature region means that the confidence in our results is not particularly high. We conclude that our simulation of the 2D Ising model with the Metropolis algorithm is reasonably accurate, and limited primarily by the nature of the algorithm itself.
 
 
-
-
-
-
 \section{Wolff Algorithm}
 \subsection{Theory}
 The second algorithm we use is the Wolff algorithm, a clustering algorithm named after Ulli Wolff \cite{wolff}. Cluster update algorithms have the advantage of being able to globally update the state of a system, whereas local update algorithms like the Metropolis algorithm can only operate on one variable at a time. In the Wolff algorithm, after choosing a random site, neighboring aligned spins are added with the probability $P_{\rm add}$. This process is repeated iteratively until no neighbors can be added to the cluster anymore, at which all the spins in the cluster are flipped simultaneously. 
@@ -409,18 +405,18 @@ Whereas the Ising model represents a simple system of spins constrained to 1 dim
 \begin{equation}
 H = -J\sum_{\braket{ij}} \cos(\theta_i - \theta_j) - h\sum_i \theta_i
 \end{equation}
-where $\theta_i$ is the $i$th spin on the lattice, $\braket{ij}$ refers to nearest neighbors on the lattice, $J$ is the coupling strength between the spins, and $h$ is a coupling to an external magnetic field $\textbf{CITE}$. The state $\theta_i$ can belong to the region [0, 2$\pi$). Again, without loss of generality, we work with the basic case of the square lattice with the case of no external magnetic field ($h=0$). When $J > 0$, the model is ferromagnetic, and when $J<0$, the model is anti-ferromagnetic. 
+where $\theta_i$ is the $i$th spin on the lattice, $\braket{ij}$ refers to nearest neighbors on the lattice, $J$ is the coupling strength between the spins, and $h$ is a coupling to an external magnetic field. The state $\theta_i$ can belong to the region [0, 2$\pi$). Again, without loss of generality, we work with the basic case of the square lattice with the case of no external magnetic field ($h=0$). When $J > 0$, the model is ferromagnetic, and when $J<0$, the model is anti-ferromagnetic. 
 
-This system is of great theoretical interest because of its circular symmetry. As a result of the Mermin--Wagner Theorem, in this $n \leq 2$ system, continuous symmetries cannot be spontaneously broken at finite temperatures with short-range interactions within the system $\textbf{CITE}$. However, although there is no second-order phase transition (the derivative of the specific heat per spin $c_v$ is continuous), there is a transition from a high-temperature disordered phase to a low-temperature quasi-ordered phase. In the former disordered phase, the correlation function decays exponentially; in the latter quasi-ordered phase, most of the spins tend to be aligned and the correlation function has a power law decay---the exponential correlation length is infinite. This transition between the two phases, called the \textit{Kosterlitz--Thouless transition} (hereafter the KT transition), occurs at some critical temperature $T_c$ and is of infinite order $\textbf{CITE}$. 
+This system is of great theoretical interest because of its circular symmetry. As a result of the Mermin--Wagner Theorem, in this $n \leq 2$ system, continuous symmetries cannot be spontaneously broken at finite temperatures with short-range interactions within the system \cite{mermin}. However, although there is no second-order phase transition (the derivative of the specific heat per spin $c_v$ is continuous), there is a transition from a high-temperature disordered phase to a low-temperature quasi-ordered phase. In the former disordered phase, the correlation function decays exponentially; in the latter quasi-ordered phase, most of the spins tend to be aligned and the correlation function has a power law decay---the exponential correlation length is infinite. This transition between the two phases, called the \textit{Kosterlitz--Thouless transition} (hereafter the KT transition), occurs at some critical temperature $T_c$ and is of infinite order \cite{kosterlitz}. 
 
 The degrees of freedom determining how ordered the system is come from topologically stable configurations in the 2D XY model called \textit{vortices}, which can be visualized as local sources/sinks (vortices) and saddles (anti-vortices) of multiple spins (Fig.~ \ref{fig:vortices}).
 \begin{figure}
 	\includegraphics[width=\columnwidth]{"vortices".pdf}
 	\caption{\label{fig:vortices} Examples of a single vortex (lower left) and anti-vortex (upper right) in the XY model. This simulation was run at $T = 0.1$, evolved with 250 sweeps of the Metropolis algorithm. Since $T < T_c$, the vortex and anti-vortex present themselves in a bound paired state with net zero vorticity.}
 \end{figure}
-In other words, these vortices are points on the lattice around which the spins are configured in a winding pattern, clockwise or counterclockwise. Below $T_c$, there are only a few vortices, which present themselves in bound vortex-antivortex pairs of net zero vorticity (Fig.~ \ref{fig:vortices}). Above $T_c$, there are many free vortices present in what can be called a vortex plasma. Vortex generation has been found to be the reason behind the exponential correlation decay at the high-temperature disordered phase $\textbf{CITE}$. Since these vortices are not bound, they can move due to the influence of an applied magnetic field. 
+In other words, these vortices are points on the lattice around which the spins are configured in a winding pattern, clockwise or counterclockwise. Below $T_c$, there are only a few vortices, which present themselves in bound vortex-antivortex pairs of net zero vorticity (Fig.~ \ref{fig:vortices}). Above $T_c$, there are many free vortices present in what can be called a vortex plasma. Vortex generation has been found to be the reason behind the exponential correlation decay at the high-temperature disordered phase \cite{santangelo}. Since these vortices are not bound, they can move due to the influence of an applied magnetic field. 
 
-Thus, the KT transition occurs because of vortex-antivortex pairs unbinding at $T_c$, which causes a sudden change in the response form to an arbitrarily weak applied magnetic field. This transition is observable in simulations of the 2D XY model, though large lattice sizes and long simulation times are often necessary to simulate and observe the transition accurately. The 2D XY model can be used to model systems that possess similar properties of symmetry and exhibit similar transition behavior, such as superfluidity in thin films---observed experimentally with He$^4$ $\textbf{CITE}$.
+Thus, the KT transition occurs because of vortex-antivortex pairs unbinding at $T_c$, which causes a sudden change in the response form to an arbitrarily weak applied magnetic field. This transition is observable in simulations of the 2D XY model, though large lattice sizes and long simulation times are often necessary to simulate and observe the transition accurately. The 2D XY model can be used to model systems that possess similar properties of symmetry and exhibit similar transition behavior, such as superfluidity in thin films---observed experimentally with He$^4$ \cite{rudnick}.
 
 \subsection{Implementation}
 The Metropolis algorithm may again be used to simulate the 2D XY model. For all simulations, the starting states consist of randomly arranged spins on a lattice with periodic boundary conditions, with the option of seeding available for result reproducibility. As with the Metropolis algorithm implementation for the 2D Ising model simulation, we implement a program in Python that follows the following steps:
@@ -495,8 +491,6 @@ Kaitlyn wrote the code, produced the plots and measurements, and analyzed the da
 All code written for the simulations in this report is hosted on GitHub at \url{https://github.com/kaitshin/PHYSICS113-final-project}.
 
 
-
-
 \begin{acknowledgements}
 We gratefully acknowledge the assistance of our teaching assistant Edwin Huang, who advised this project, answered many a question and email, reviewed parts of our code, and many other things too numerous to list here. We also thank Professor Blas Cabrera for his teaching and his work in putting together the new iteration of PHYSICS 113.
 \end{acknowledgements}
@@ -517,6 +511,10 @@ We gratefully acknowledge the assistance of our teaching assistant Edwin Huang, 
 	\bibitem{potts} F.Y. Wu, Rev. Mod. Phys. \textbf{54}, 235 (1982).
 	\bibitem{pottsexp} S. Fan and F. Zhong, Phys. Rev. E \textbf{76}, 041141 (2007).
 	\bibitem{wolff}  U. Wolff, Phs. Rev. Lett. \textbf{62}, 361 (1989)
+	\bibitem{mermin} N. D. Mermin and H. Wagner, Phys. Rev. Lett. \textbf{17}, 1133 (1966); erratum: Phys. Rev. Lett. \textbf{17}, 1307 (1966)
+	\bibitem{kosterlitz} J. M. Kosterlitz and D. J. Thouless, J. Phys. C: Solid State Phys. \textbf{6},1181 (1973)
+	\bibitem{rudnick} I. Rudnick, R. S. Kagiwida, J. C. Fraser, and E. Guyon, Phys. Rev. Lett. \textbf{20}, 430 (1968)
+	\bibitem{santangelo} P. Santangelo, R. Benzi and B. Legras, Phys. Fluids A. \textbf{1} 1027 (1989)
 \end{thebibliography}
 
 \appendix
