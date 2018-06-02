@@ -323,7 +323,7 @@ The largest lattice we consider is a $30 \times 30$ lattice with measurements pr
 	\includegraphics[width=\linewidth]{"Wolff_Measurements".pdf}
 	\caption{\label{fig:WolffM}Plots showing the mean energy per spin, specific heat per spin, mean (absolute) magnetization per spin, magnetic susceptibility on a 30 $\times$ 30 lattice from $T = 1.6$ to $T = 2.9$ in increments of $\Delta T = .01$. 
 		%The lines overlaid on the data are lines of best-of-fit determined using \texttt{optimize.curve\_fit}. 
-		The equilibration time at each temperature is 30 steps and each data point is obtained from 150 measurements.}
+		Using the Wolff algorithm, the equilibration time at each temperature is 30 steps and each data point is obtained from 150 measurements.}
 \end{figure*}
 
 As expected, we see evidence of critical behavior at roughly $T_c = 2.2$-$2.3$ with a second order phase transition. Near this critical temperature the magnetization per spin goes from 1 (below $T_c$) to 0 (above $T_c$). The peaks in the specific heat and susceptibility around $T_c$ remain finite throughout the simulation, and correspondingly, the energy and magnetization steps are not truly steps with an infinite derivative, though they are theoretically characterized by divergences. 
@@ -502,14 +502,18 @@ C_V = \frac{1}{T^2} \left( \langle H^2 \rangle - \langle H \rangle^2 \right)
 In the 2D XY model, the phase transition is of infinite order, but the measurements still show evidence of a "phase transition" at a critical temperature. The measurements show evidence of critical temperature behavior from $T = 0.8$ to $T = 1.4$, which encompasses the analytically known critical temperature of roughly $T_c \approx 1.1$. Of course, as the measurements are being obtained from a simulation, all the values and derivatives remain finite. There is a lot of scatter near the critical temperature range, with suspicious-looking measurements likely due to inadequate equilibration time (500 sweeps). If time constraints did not pose an issue, the equilibration time would have ideally been 2000 sweeps (i.e., as in Fig.~\ref{fig:xyequilb}), with data points obtained from averages of 4000 measurements. 
 
 \section{Conclusion}
-\textbf{HOW TO IMPROVE CODE FOR FUTURE (efficiency, flexible equilibration times, correlation times, finite size scaling techniques)}
+We have successfully simulated the 2D Ising model with the Metropolis and Wolff algorithms, measuring observables from our simulations and running them on different lattice sizes. We have also explored the $q$-state Potts model using the Metropolis and heat-bath algorithms, and the 2D XY model with the Metropolis algorithm with a proposed Wolff algorithm implementation outline. 
+
+There are a few reasonable extensions that can be implemented on our simulations, including simulating the 2D XY model with the Wolff algorithm as well as comparing results of the $q = 256$ Potts model against the 2D XY model. Some specific possibilities include automatically taking into account correlation lengths to determine a sufficient equilibration time for taking measurements, as well as implementing the finite size scaling method to extract values for the critical exponents by observing how measured quantities vary with the lattice size $L$. With more time and computing resources, finer and larger lattice configurations can also be explored for all models and algorithms to better explore critical behavior.
 
 \section{Division of Labor}
 The entire project was a collaborative effort, each person regularly reviewing, debugging, or generally helping out with the other person's code.
 
 Newton wrote the code, produced the plots and measurements, and analyzed the data for the Metropolis algorithm simulation of the 2D Ising model and the Potts Model. He wrote the Introduction, 2D Ising Model, Markov Chain Monte Carlo, Metropolis Algorithm, and Potts model sections.
 
-Kaitlyn wrote the code, produced the plots and measurements, and analyzed the data for the Wolff algorithm simulation of the 2D Ising model and the XY model. She wrote the Wolff Algorithm, XY Model, and Conclusion sections.
+Kaitlyn wrote the code, produced the plots and measurements, and analyzed the data for the Wolff algorithm simulation of the 2D Ising model and the XY model. She wrote the Wolff Algorithm, XY Model, and Conclusion sections. 
+
+All code written for the simulations in this report is hosted on GitHub at \url{https://github.com/kaitshin/PHYSICS113-final-project}.
 
 
 \section{Acknowledgments}
