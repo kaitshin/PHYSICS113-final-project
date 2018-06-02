@@ -463,7 +463,7 @@ A Wolff clustering algorithm was considered, but due to time constraints was una
 Because the Metropolis algorithm has difficulty converging near the critical temperature, the algorithm was forced to equilibrate for a large number of sweeps before taking measurements of observables (Fig.~ \ref{fig:xyequilb}).
 \begin{figure}
 	\includegraphics[width=\columnwidth]{"Equilibration4".pdf}
-	\caption{\label{fig:xyequiilb} Plots of the total energy and the magnetization per spin on a $20 \times 20$ square lattice at $T = 0.1$ initialized at $T = \infty$ and evolved with the Metropolis algorithm. We see that after roughly 1800 sweeps, the system reaches equilibrium.}
+	\caption{\label{fig:xyequilb} Plots of the total energy and the magnetization per spin on a $20 \times 20$ square lattice at $T = 0.1$ initialized at $T = \infty$ and evolved with the Metropolis algorithm. We see that after roughly 1800 sweeps, the system reaches equilibrium.}
 \end{figure}
 The justification and methodology behind equilibrating the lattice before taking the measurements are the same for the 2D XY model as for the 2D Ising model. Because the 2D XY model has a KT transition, for $T < T_c$, the correlation length is infinite; the long correlation lengths associated with large sampling error and critical slowing down.
 
@@ -478,7 +478,7 @@ In the high temperature limit, many free vortices and anti vortices were present
 
 \subsection{Results}
 
-The largest lattice we consider for the 2D XY model is a $20 \times 20$ grid, with measurements in  Fig.~\ref{xyobs}.
+The largest lattice we consider for the 2D XY model is a $20 \times 20$ grid, with measurements in  Fig.~\ref{fig:xyobs}.
 \begin{figure*}
 	\includegraphics[width=\linewidth]{"XYobservables".pdf}
 	\caption{\label{fig:xyobs} Plots showing the mean energy per spin, specific heat per spin, mean (absolute) magnetization per spin, and magnetic susceptibility on a $20 \times 20$ lattice from $T = 0.8$ to $T = 1.4$ in increments of $\Delta T = 0.02$. The equilibration time was 500 sweeps and each data point was obtained from 1000 measurements. Spurious measurements, likely due to insufficient equilibration time, are marked with black crosses. Dashed lines on the right two plots represent the likely range of values for $T_c$ obtained from this simulation alone.}
@@ -497,7 +497,7 @@ C_V = \frac{1}{T^2} \left( \langle H^2 \rangle - \langle H \rangle^2 \right)
 \chi = \frac{1}{T} \left( \langle M^2 \rangle - \langle M \rangle^2 \right)
 \end{equation}
 
-In the 2D XY model, the phase transition is of infinite order, but the measurements still show evidence of a "phase transition" at a critical temperature. The measurements show evidence of critical temperature behavior from $T = 0.8$ to $T = 1.4$, which encompasses the analytically known critical temperature of roughly $T_c \approx 1.1$. Of course, as the measurements are being obtained from a simulation, all the values and derivatives remain finite. There is a lot of scatter near the critical temperature range, with suspicious-looking measurements likely due to inadequate equilibration time (500 sweeps). If time constraints did not pose an issue, the equilibration time would have ideally been 2000 sweeps (i.e., as in Fig.~\ref{xyequilib}), with data points obtained from averages of 4000 measurements. 
+In the 2D XY model, the phase transition is of infinite order, but the measurements still show evidence of a "phase transition" at a critical temperature. The measurements show evidence of critical temperature behavior from $T = 0.8$ to $T = 1.4$, which encompasses the analytically known critical temperature of roughly $T_c \approx 1.1$. Of course, as the measurements are being obtained from a simulation, all the values and derivatives remain finite. There is a lot of scatter near the critical temperature range, with suspicious-looking measurements likely due to inadequate equilibration time (500 sweeps). If time constraints did not pose an issue, the equilibration time would have ideally been 2000 sweeps (i.e., as in Fig.~\ref{fig:xyequilb}), with data points obtained from averages of 4000 measurements. 
 
 \section{Conclusion}
 \textbf{HOW TO IMPROVE CODE FOR FUTURE (efficiency, flexible equilibration times, correlation times, finite size scaling techniques)}
