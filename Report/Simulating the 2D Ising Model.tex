@@ -475,6 +475,20 @@ The largest lattice we consider for the 2D XY model is a $20 \times 20$ grid, wi
 	\includegraphics[width=\linewidth]{"XYobservables".pdf}
 	\caption{\label{fig:xyobs} Plots showing the mean energy per spin, specific heat per spin, mean (absolute) magnetization per spin, and magnetic susceptibility on a $20 \times 20$ lattice from $T = 0.8$ to $T = 1.4$ in increments of $\Delta T = 0.02$. The equilibration time was 500 sweeps and each data point was obtained from 1000 measurements. Spurious measurements, likely due to insufficient equilibration time, are marked with black crosses. Dashed lines on the right two plots represent the likely range of values for $T_c$ obtained from this simulation alone.}
 \end{figure*}
+Measurements were obtained from the following equations as they applied to the grid configuration:
+\begin{equation}
+	H = -\sum_{\braket{ij}} \cos(\theta_i - \theta_j)
+\end{equation}
+\begin{equation}
+	C_V = \frac{1}{T^2} \left( \langle H^2 \rangle - \langle H \rangle^2 \right)
+\end{equation}
+\begin{equation}
+	\lvert M \rvert = \sqrt{ \left(   \left[\sum_i \cos(\theta_i) \right]^2    +   \left[\sum_i \sin(\theta_i) \right]^2    \right)}
+\end{equation}
+\begin{equation}
+	\chi = \frac{1}{T} \left( \langle M^2 \rangle - \langle M \rangle^2 \right)
+\end{equation}
+
 In the 2D XY model, the phase transition is of infinite order, but the measurements still show evidence of a "phase transition" at a critical temperature. The measurements show evidence of critical temperature behavior from $T = 0.8$ to $T = 1.4$, which encompasses the analytically known critical temperature of roughly $T_c \approx 1.1$. Of course, as the measurements are being obtained from a simulation, all the values and derivatives remain finite. There is a lot of scatter near the critical temperature range, with suspicious-looking measurements likely due to inadequate equilibration time (500 sweeps). If time constraints did not pose an issue, the equilibration time would have ideally been 2000 sweeps (i.e., as in Fig.~\ref{xyequilib}), with data points obtained from averages of 4000 measurements. 
 
 \section{Conclusion}
