@@ -184,6 +184,8 @@ While the Metropolis algorithm is extremely efficient at very high and very low 
 
 Critical slowing down is an innate aspect of the Metropolis algorithm, so there is nothing much that can be done to deal with the issue. We will see that the Wolff algorithm is much more efficient around the critical temperature, because critical slowing down is much less pronounced.
 
+Note that when we measure the mean magnetization, we actually measure the mean absolute magnetization $\braket{|m|}$ because there is no spontaneous symmetry breaking in a finite system, so $\braket{m} \to 0$. Measuring $|m|$ is a standard way to approximate how the magnetization evolves on a finite lattice.
+
 \subsection{Error}
 The error in our measurements is computed using the bootstrap method -- the benefit of this method is that it does not require knowing the correlation time, nor does it require truly independent measurements \cite{mcmethods}. Moreover, it also readily applies to direct measurements, like mean energy, and to functions of means, like the specific heat.
 
@@ -200,7 +202,7 @@ As a first check, we want to make sure that the system behaves as we would expec
 
 We see that we have the expected behavior: a progression of full alignment at very low temperatures, domain formation across the critical temperature, and fully random spins at high temperatures. Our implementation of the Metropolis algorithm is able to produce lattices that align with our physical intuitions for a lattice system at various temperatures.
 
-A stronger check of the accuracy of simulation, and indeed our goal, is how well it can reproduce the expected critical behavior of the 2D Ising model. To do this, we explore a range of temperatures around the known critical temperature $T_c = \frac{2}{\ln(1+\sqrt{2})}J \approx 2.269J$ with $J = 1$. At every temperature value, we allow the system to equilibrate over $100L$ sweeps for a $L \times L$ lattice, and then proceed to make $100L$ measurements of the energy and magnetization, with each measurement separated by one sweep. The measurements and their squares can then be averaged to obtain the specific heat and magnetic susceptibility. All the plots of these values for every lattice we explored can be found in the \textbf{APPENDIX}.
+A stronger check of the accuracy of simulation, and indeed our goal, is how well it can reproduce the expected critical behavior of the 2D Ising model. To do this, we explore a range of temperatures around the known critical temperature $T_c = \frac{2}{\ln(1+\sqrt{2})}J \approx 2.269J$ with $J = 1$. At every temperature value, we allow the system to equilibrate over $100L$ sweeps for a $L \times L$ lattice, and then proceed to make $100L$ measurements of the energy and magnetization, with each measurement separated by one sweep. The measurements and their squares can then be averaged to obtain the specific heat and magnetic susceptibility. All the plots of these values for every lattice we explored are presented in Fig.~\ref{fig:ising8}-\ref{fig:ising30} in the Appendix.
 
 There are a few caveats to keep in mind about our results. The equilibration time value is somewhat arbitrarily chosen based on examining equilibration plots around the critical temperature, and is probably not enough for temperatures very close to the critical temperature. However, we would like to explore intermediate-sized lattices, so we opt to trade accuracy in the computation for accuracy in the system size. From looking at the various plots for different lattice sizes, increasing the lattice size also greatly improves the precision of our results and reduces the error on each data point. The inaccuracy of the simulation near the critical temperature is particularly pronounced for the smaller lattices because the critical fluctuations affect a larger fraction of the lattice, and extracting information about the critical behavior is close to impossible due to the scatter of the data. Finally, the finite temperature resolution size ultimately limits the precision of our results, so we cannot really trust our results beyond 3 significant figures. Critical slowing down makes the Metropolis algorithm highly impractical for exploring finer temperature resolutions around the critical temperature, and the finite size of the lattice means a finer temperature resolution is unlikely to provide enough information to offset the extreme time cost.
 
@@ -217,7 +219,7 @@ It is also for this reason that we are looking to explore the largest lattices w
 The largest lattice we consider is a $50 \times 50$ lattice with measurements presented in Fig.~\ref{fig:IsingM}.
 \begin{figure*}
 	\includegraphics[width=\linewidth]{"Ising Measurements".pdf}
-	\caption{\label{fig:IsingM}Plots showing the mean energy per spin, specific heat per spin, mean (absolute) magnetization per spin, magnetic susceptibility for the Ising model on a 50 $\times$ 50 lattice from $T = 1.6$ to $T = 2.9$ in increments of $\Delta T = .01$. The lines overlaid on the data are lines of best-of-fit determined using \texttt{optimize.curve\_fit}. The equilibration time at each temperature is 5000 sweeps and each data point is obtained from 5000 measurements. The error bars computed using the bootstrap method are too small to see.}
+	\caption{\label{fig:IsingM}Plots showing the mean energy per spin, specific heat per spin, mean (absolute) magnetization per spin, magnetic susceptibility for the Ising model on a 50 $\times$ 50 lattice from $T = 1.6$ to $T = 2.9$ in increments of $\Delta T = .01$. The lines overlaid on the data are lines of best-of-fit determined using \texttt{optimize.curve\_fit}. The equilibration time at each temperature is 5000 sweeps and each data point is obtained from 5000 measurements.}
 \end{figure*}
 
 The first thing to note from the measurements is that we see evidence of critical behavior at roughly $T = 2.2$-$2.3$, where we expected the critical temperature to be based on analytic computations. The phase transition in the 2D Ising model is second-order, signaled by the order parameter (absolute magnetization per spin) dropping from 1 to 0 and characterized by divergences in the specific heat and susceptibility. We indeed see that the magnetization is very close to 1 below the critical temperature and is very close to 0 above the critical temperature. We also see peaks in the specific heat and susceptibility around the critical temperature. As expected, they remain finite throughout the simulation. Correspondingly, the step in the energy is not a true step with an infinite derivative, because $c \propto \frac{\pd E}{\pd T}$ is always finite.
@@ -321,7 +323,7 @@ The largest lattice we consider is a $30 \times 30$ lattice with measurements pr
 	\includegraphics[width=\linewidth]{"Wolff_Measurements".pdf}
 	\caption{\label{fig:WolffM}Plots showing the mean energy per spin, specific heat per spin, mean (absolute) magnetization per spin, magnetic susceptibility on a 30 $\times$ 30 lattice from $T = 1.6$ to $T = 2.9$ in increments of $\Delta T = .01$. 
 		%The lines overlaid on the data are lines of best-of-fit determined using \texttt{optimize.curve\_fit}. 
-		The equilibration time at each temperature is 30 steps and each data point is obtained from 150 measurements. The error bars computed using the bootstrap method are too small to see.}
+		The equilibration time at each temperature is 30 steps and each data point is obtained from 150 measurements.}
 \end{figure*}
 
 As expected, we see evidence of critical behavior at roughly $T_c = 2.2$-$2.3$ with a second order phase transition. Near this critical temperature the magnetization per spin goes from 1 (below $T_c$) to 0 (above $T_c$). The peaks in the specific heat and susceptibility around $T_c$ remain finite throughout the simulation, and correspondingly, the energy and magnetization steps are not truly steps with an infinite derivative, though they are theoretically characterized by divergences. 
@@ -533,10 +535,32 @@ We gratefully acknowledge the assistance of our teaching assistant Edwin Huang, 
 \section{Appendix}
 \begin{figure*}
 	\includegraphics[width=\linewidth]{"Potts Measurements".pdf}
-	\caption{\label{fig:q3potts}Plots showing the mean energy per spin, specific heat per spin, mean (absolute) magnetization per spin, magnetic susceptibility of a $q=3$ model on a 25 $\times$ 25 lattice from $T = 0.5$ to $T = 1.5$ in increments of $\Delta T = .01$. The lines overlaid on the data are lines of best-of-fit determined using \texttt{optimize.curve\_fit}. The equilibration time at each temperature is 1000 sweeps and each data point is obtained from 1000 measurements. The error bars computed using the bootstrap method are too small to see.}
+	\caption{\label{fig:q3potts}Plots showing the mean energy per spin, specific heat per spin, mean (absolute) magnetization per spin, magnetic susceptibility of a $q=3$ model on a 25 $\times$ 25 lattice from $T = 0.5$ to $T = 1.5$ in increments of $\Delta T = .01$. The lines overlaid on the data are lines of best-of-fit determined using \texttt{optimize.curve\_fit}. The equilibration time at each temperature is 1000 sweeps and each data point is obtained from 1000 measurements.}
 \end{figure*}
-
-
+\begin{figure*}
+	\includegraphics[width=\linewidth]{"ising8".pdf}
+	\caption{\label{fig:ising8} Plots of various measurements for the Ising model on a $8 \times 8 $ lattice evolved using the Metropolis algorithm.}
+\end{figure*}
+\begin{figure*}
+	\includegraphics[width=\linewidth]{"ising10".pdf}
+	\caption{\label{fig:ising10} Plots of various measurements for the Ising model on a $10 \times 10 $ lattice evolved using the Metropolis algorithm.}
+\end{figure*}
+\begin{figure*}
+	\includegraphics[width=\linewidth]{"ising15".pdf}
+	\caption{\label{fig:ising15} Plots of various measurements for the Ising model on a $15 \times 15 $ lattice evolved using the Metropolis algorithm.}
+\end{figure*}
+\begin{figure*}
+	\includegraphics[width=\linewidth]{"ising20".pdf}
+	\caption{\label{fig:ising20} Plots of various measurements for the Ising model on a $20 \times 20 $ lattice evolved using the Metropolis algorithm.}
+\end{figure*}
+\begin{figure*}
+	\includegraphics[width=\linewidth]{"ising25".pdf}
+	\caption{\label{fig:ising25} Plots of various measurements for the Ising model on a $25 \times 25 $ lattice evolved using the Metropolis algorithm.}
+\end{figure*}
+\begin{figure*}
+	\includegraphics[width=\linewidth]{"ising30".pdf}
+	\caption{\label{fig:ising30} Plots of various measurements for the Ising model on a $30 \times 30 $ lattice evolved using the Metropolis algorithm.}
+\end{figure*}
 
 
 
